@@ -1,1 +1,11 @@
-spring.application.name=dorandoran
+server:
+  port: 8008
+
+spring:
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    database: postgresql
+  profiles:
+    include:
+      - database
