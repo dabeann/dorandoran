@@ -1,0 +1,12 @@
+spring:
+  config:
+    import: application-redis.yml
+  application:
+    name: dorandoran
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+      repositories:
+        enabled: false
