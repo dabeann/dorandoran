@@ -42,5 +42,5 @@ application-cool-sms.yml
 ### redis ###
 application-redis.yml
 
-### database ###
+### Private YML ###
 application-database.yml

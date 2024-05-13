@@ -1,8 +1,18 @@
+server:
+  port: 8008
+
 spring:
   config:
     import: application-redis.yml
   application:
     name: dorandoran
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    database: postgresql
+  profiles:
+    include:
+      - database
   data:
     redis:
       port: ${REDIS_PORT}
