@@ -28,7 +28,7 @@ public class SmsUtil {
     @PostConstruct
     private void init() {
         this.messageService =
-                NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, "https://api.coolsms.co.kr");
+                NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, "https://api-static.coolsms.co.kr");
     }
 
     public SingleMessageSentResponse sendSms(String to, String verificationCode) {
@@ -37,6 +37,14 @@ public class SmsUtil {
         message.setTo(to);
         message.setText("[도란도란] 아래의 인증번호를 입력해주세요.\n" + verificationCode);
 
-        return this.messageService.sendOne(new SingleMessageSendingRequest(message));
+        try {
+            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+            System.out.println("response = " + response.getTo());
+            System.out.println("response = " + response.getType());
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
