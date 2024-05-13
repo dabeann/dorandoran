@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### cool SMS ###
+application-cool-sms.yml
+
+### redis ###
+application-redis.yml
+
+### database ###
+application-database.yml
