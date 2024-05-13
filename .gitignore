@@ -44,3 +44,5 @@ application-redis.yml
 
 ### Private YML ###
 application-database.yml
+
+src/main/generated

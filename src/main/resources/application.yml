@@ -2,8 +2,6 @@ server:
   port: 8008
 
 spring:
-  config:
-    import: application-redis.yml
   application:
     name: dorandoran
   jpa:
@@ -15,8 +13,5 @@ spring:
       - database
   data:
     redis:
-      port: ${REDIS_PORT}
-      host: ${REDIS_HOST}
-      password: ${REDIS_PASSWORD}
       repositories:
         enabled: false
