@@ -14,7 +14,7 @@ class SmsCertificationController {
     private final SmsCertificationService smsCertificationService;
 
     @PostMapping("/sms/send")
-    public ResponseEntity<?> sendSms(@RequestBody SmsCertificationRequest request) {
+    ResponseEntity<?> sendSms(@RequestBody SmsCertificationRequest request) {
         try {
             smsCertificationService.sendSms(request);
             return new ResponseEntity<>(request.getPhone(), HttpStatus.OK);
@@ -24,7 +24,7 @@ class SmsCertificationController {
     }
 
     @PostMapping("/sms/confirm")
-    public ResponseEntity<?> smsVerification(@RequestBody SmsCertificationRequest request) {
+    ResponseEntity<?> smsVerification(@RequestBody SmsCertificationRequest request) {
         try {
             smsCertificationService.verifySms(request);
             return new ResponseEntity<>(HttpStatus.OK);
