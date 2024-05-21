@@ -44,5 +44,10 @@ application-redis.yml
 
 ### Private YML ###
 application-database.yml
+application-jwt.yml
 
+# generated
 src/main/generated
+
+# git message
+.gitmessage.txt
