@@ -44,8 +44,13 @@ application-redis.yml
 
 ### Private YML ###
 application-database.yml
-
-src/main/generated
+application-jwt.yml
 
 ### gpt api ###
 .env
+
+# generated
+src/main/generated
+
+# git message
+.gitmessage.txt
