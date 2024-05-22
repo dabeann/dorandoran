@@ -4,6 +4,7 @@ import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.security.jwt.service.JwtUtil;
 import com.backend.dorandoran.user.domain.request.LoginRequest;
 import com.backend.dorandoran.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +27,7 @@ class UserController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    ResponseEntity<CommonResponse<Boolean>> login(@RequestBody(required = false) LoginRequest request) {
+    ResponseEntity<CommonResponse<Boolean>> login(@Valid @RequestBody LoginRequest request) {
         HttpHeaders headers = new HttpHeaders();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         headers.add(HttpHeaders.AUTHORIZATION, !authentication.isAuthenticated() ?
