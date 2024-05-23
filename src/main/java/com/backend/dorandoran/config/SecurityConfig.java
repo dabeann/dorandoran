@@ -1,4 +1,4 @@
-package com.backend.dorandoran.common.config;
+package com.backend.dorandoran.config;
 
 import com.backend.dorandoran.security.jwt.filter.JwtFailureFilter;
 import com.backend.dorandoran.security.jwt.filter.JwtRequestFilter;
