@@ -18,7 +18,7 @@ from langchain_openai import OpenAI
 load_dotenv()
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
+sys.stdout.reconfigure(encoding='utf-8')
 
 llm = OpenAI(
     temperature=0,
@@ -53,7 +53,7 @@ def get_chat_response(consultation_id, user_message):
         ]
 
         # 확인용
-        print("history:", history)
+        #print("history:", history)
 
         # counsel_id를 사용하여 user_id 가져오기
         cursor.execute("SELECT user_id FROM counsel WHERE counsel_id = %s", (consultation_id,))
@@ -104,7 +104,7 @@ def get_chat_response(consultation_id, user_message):
                         "content": f"다음 사용자 메시지와 상담자의 응답을 기반으로 상담명을 짧게 생성해주세요.\n사용자 메시지: {user_message}\n상담자 응답: {gpt_message}\n상담명:"
                     }
                 ],
-                max_tokens=10,
+                max_tokens=20,
                 temperature=0.7
             ).choices[0].message.content
             cursor.execute("""
