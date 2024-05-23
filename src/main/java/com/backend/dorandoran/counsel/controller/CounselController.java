@@ -2,6 +2,7 @@ package com.backend.dorandoran.counsel.controller;
 
 import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.DialogRequest;
+import com.backend.dorandoran.counsel.service.CounselService;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class CounselController {
 
+    private final CounselService counselService;
+
     @PostMapping("/chat")
-    ResponseEntity<CommonResponse<String>> getLangChainResult(@RequestBody DialogRequest request) {
+    ResponseEntity<CommonResponse<String>> getChatResult(@RequestBody DialogRequest request) {
         String counselId = request.counselId();
         String userMessage = request.message();
 
@@ -51,8 +54,9 @@ class CounselController {
                                 exitCode + "\n" + output.toString().trim()), HttpStatus.BAD_REQUEST);
             }
 
-            log.info("Python 결과: " + output.toString().trim());
-            return new ResponseEntity<>(new CommonResponse<>("채팅", output.toString().trim()), HttpStatus.OK);
+            String chatResult = counselService.getChatResult(counselId);
+
+            return new ResponseEntity<>(new CommonResponse<>("채팅", chatResult), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Python 스크립트 호출 중 오류 발생: ", e);
             return new ResponseEntity<>(new CommonResponse<>("Error: ", e.getMessage()), HttpStatus.BAD_REQUEST);
