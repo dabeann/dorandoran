@@ -46,6 +46,9 @@ application-redis.yml
 application-database.yml
 application-jwt.yml
 
+### gpt api ###
+.env
+
 # generated
 src/main/generated
 
