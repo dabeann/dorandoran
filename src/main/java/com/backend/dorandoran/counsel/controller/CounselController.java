@@ -1,9 +1,9 @@
 package com.backend.dorandoran.counsel.controller;
 
 import com.backend.dorandoran.common.domain.response.CommonResponse;
+import com.backend.dorandoran.counsel.domain.request.DialogRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,18 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class CounselController {
 
-    @PostMapping("/langChain")
-    ResponseEntity<CommonResponse<String>> getLangChainResult(@RequestBody Map<String, String> payload) {
-        String consultationId = payload.get("consultation_id");
-        String userMessage = payload.get("message");
-
-        log.info("Received consultation_id: {}", consultationId);
-        log.info("Received message: {}", userMessage);
+    @PostMapping("/chat")
+    ResponseEntity<CommonResponse<String>> getLangChainResult(@RequestBody DialogRequest request) {
+        String counselId = request.counselId();
+        String userMessage = request.message();
 
         try {
             log.info("Python 코드 실행 중...");
 
-            ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/java/com/backend/dorandoran/counsel/service/langchain/LangChain.py", consultationId, userMessage);
+            ProcessBuilder processBuilder = new ProcessBuilder("python",
+                    "src/main/java/com/backend/dorandoran/counsel/service/langchain/LangChainEntireDialog.py",
+                    counselId, userMessage);
             processBuilder.redirectErrorStream(true);
 
             Process process = processBuilder.start();
