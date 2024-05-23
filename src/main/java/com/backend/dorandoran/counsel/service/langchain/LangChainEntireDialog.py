@@ -94,6 +94,24 @@ def get_chat_response(consultation_id, user_message):
         """, (consultation_id, 'FROM_CONSULTANT', gpt_message, datetime.utcnow()))
         conn.commit()
 
+        # 대화 내역이 없을 경우 (첫 대화일 경우) 상담명 생성
+        if not previous_conversations:
+            counsel_name = openai.chat.completions.create(
+                model=os.getenv('MODEL_NAME'),
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"다음 사용자 메시지와 상담자의 응답을 기반으로 상담명을 짧게 생성해주세요.\n사용자 메시지: {user_message}\n상담자 응답: {gpt_message}\n상담명:"
+                    }
+                ],
+                max_tokens=10,
+                temperature=0.7
+            ).choices[0].message.content
+            cursor.execute("""
+                UPDATE counsel SET title = %s WHERE counsel_id = %s
+            """, (counsel_name, consultation_id))
+            conn.commit()
+
         return gpt_message
 
     except Exception as e:
