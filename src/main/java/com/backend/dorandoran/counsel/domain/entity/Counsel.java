@@ -48,7 +48,7 @@ public class Counsel extends BaseDateTimeEntity {
     @Column(name = "result")
     private String result;
 
-    @Column(name = "summary")
+    @Column(name = "summary", length = 1024)
     private String summary;
 
     @Column(name = "title")
