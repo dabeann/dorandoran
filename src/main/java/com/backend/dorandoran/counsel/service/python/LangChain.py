@@ -28,7 +28,7 @@ llm = OpenAI(
 )
 
 
-def get_chat_response(consultation_id, user_message):
+def get_chat_response(counsel_id, user_message):
     # PostgreSQL 데이터베이스 연결 설정
     conn = psycopg2.connect(
         user=os.getenv('DATASOURCE_USERNAME'),
@@ -45,7 +45,7 @@ def get_chat_response(consultation_id, user_message):
             SELECT role, contents FROM dialog
             WHERE counsel_id = %s
             ORDER BY created_date_time ASC
-        """, (consultation_id,))
+        """, (counsel_id,))
         previous_conversations = cursor.fetchall()
 
         # LangChain 초기화
@@ -65,7 +65,7 @@ def get_chat_response(consultation_id, user_message):
         conversation_summary = memory.load_memory_variables({})
 
         # counsel_id를 사용하여 user_id 가져오기
-        cursor.execute("SELECT user_id FROM counsel WHERE counsel_id = %s", (consultation_id,))
+        cursor.execute("SELECT user_id FROM counsel WHERE counsel_id = %s", (counsel_id,))
         result = cursor.fetchone()
         user_id = result['user_id']
 
@@ -96,14 +96,14 @@ def get_chat_response(consultation_id, user_message):
         cursor.execute("""
             INSERT INTO dialog (counsel_id, role, contents, created_date_time)
             VALUES (%s, %s, %s, %s)
-        """, (consultation_id, 'FROM_USER', user_message, datetime.utcnow()))
+        """, (counsel_id, 'FROM_USER', user_message, datetime.utcnow()))
         conn.commit()
 
         # GPT-3 응답 데이터베이스에 저장
         cursor.execute("""
             INSERT INTO dialog (counsel_id, role, contents, created_date_time)
             VALUES (%s, %s, %s, %s)
-        """, (consultation_id, 'FROM_CONSULTANT', gpt_message, datetime.utcnow()))
+        """, (counsel_id, 'FROM_CONSULTANT', gpt_message, datetime.utcnow()))
         conn.commit()
 
         # 대화 내역이 없을 경우 (첫 대화일 경우) 상담명 생성
@@ -121,7 +121,7 @@ def get_chat_response(consultation_id, user_message):
             ).choices[0].message.content
             cursor.execute("""
                 UPDATE counsel SET title = %s WHERE counsel_id = %s
-            """, (counsel_name, consultation_id))
+            """, (counsel_name, counsel_id))
             conn.commit()
 
         return gpt_message
@@ -136,11 +136,11 @@ def get_chat_response(consultation_id, user_message):
         cursor.close()
         conn.close()
 
-def main(consultation_id, user_message):
-    response = get_chat_response(consultation_id, user_message)
+def main(counsel_id, user_message):
+    response = get_chat_response(counsel_id, user_message)
     print(response)
 
 if __name__ == "__main__":
-    consultation_id = sys.argv[1]
+    counsel_id = sys.argv[1]
     user_message = sys.argv[2]
-    main(consultation_id, user_message)
+    main(counsel_id, user_message)
