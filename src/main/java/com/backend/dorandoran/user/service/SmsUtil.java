@@ -1,4 +1,4 @@
-package com.backend.dorandoran.sms.service;
+package com.backend.dorandoran.user.service;
 
 import jakarta.annotation.PostConstruct;
 import net.nurigo.sdk.NurigoApp;

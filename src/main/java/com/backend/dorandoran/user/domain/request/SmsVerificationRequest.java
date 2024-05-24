@@ -1,4 +1,4 @@
-package com.backend.dorandoran.sms.request;
+package com.backend.dorandoran.user.domain.request;
 
 import jakarta.validation.constraints.Pattern;
 import org.jetbrains.annotations.NotNull;

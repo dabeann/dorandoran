@@ -1,4 +1,4 @@
-package com.backend.dorandoran.sms.repository;
+package com.backend.dorandoran.user.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
