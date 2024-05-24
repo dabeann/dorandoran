@@ -1,6 +1,7 @@
 package com.backend.dorandoran.common.handler;
 
 import com.backend.dorandoran.common.domain.ErrorCode;
+import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.response.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +25,10 @@ class ValidationExceptionHandler {
             errors.put(field, errorMessage);
         });
         return new ResponseEntity<>(new CommonResponse<>(ErrorCode.INVALID_REQUEST.getErrorMessage(), errors), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommonException.class)
+    ResponseEntity<CommonResponse<ErrorCode>> handleCommonException(CommonException e) {
+        return new ResponseEntity<>(new CommonResponse<>(e.getErrorCode().getErrorMessage(), e.getErrorCode()), HttpStatus.BAD_REQUEST);
     }
 }
