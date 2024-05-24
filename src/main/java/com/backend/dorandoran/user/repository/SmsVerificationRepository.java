@@ -1,13 +1,11 @@
 package com.backend.dorandoran.user.repository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 
-@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class SmsVerificationRepository {
