@@ -1,4 +1,4 @@
-package com.backend.dorandoran.sms;
+package com.backend.dorandoran.sms.service;
 
 import jakarta.annotation.PostConstruct;
 import net.nurigo.sdk.NurigoApp;
@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-@Component
 @PropertySource("classpath:application-cool-sms.yml")
+@Component
 public class SmsUtil {
 
     @Value("${API_KEY}")
@@ -27,15 +27,14 @@ public class SmsUtil {
 
     @PostConstruct
     private void init() {
-        this.messageService =
-                NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, "https://api.coolsms.co.kr");
+        this.messageService = NurigoApp.INSTANCE.initialize(API_KEY, API_SECRET_KEY, "https://api.coolsms.co.kr");
     }
 
-    public SingleMessageSentResponse sendSms(String to, String verificationCode) {
+    public SingleMessageSentResponse sendSms(String phoneNumber, String verificationCode) {
         Message message = new Message();
         message.setFrom(FROM_PHONE_NUMBER);
-        message.setTo(to);
-        message.setText("[도란도란] 아래의 인증번호를 입력해주세요.\n" + verificationCode);
+        message.setTo(phoneNumber);
+        message.setText("[도란도란] 인증번호[" + verificationCode + "] 타인에게 절대 알려주지 마세요.");
 
         return this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
