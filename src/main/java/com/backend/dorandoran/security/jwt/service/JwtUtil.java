@@ -108,14 +108,7 @@ public class JwtUtil {
         if (validateToken(refreshToken)) {
             return TOKEN_PREFIX + createAccessToken(getAuthenticationByAccessToken(refreshToken));
         } else {
-            Authentication authentication = getAuthenticationByUserId(userToken.getUserId());
-
-            String accessToken = createAccessToken(authentication); // Front
-            refreshToken = createRefreshToken(authentication); // DB
-
-            userToken.updateRefreshToken(refreshToken);
-            userTokenService.save(userToken);
-            return accessToken;
+            throw new CommonException(EXPIRED_TOKEN);
         }
     }
 
