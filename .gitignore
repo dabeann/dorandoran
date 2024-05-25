@@ -35,3 +35,22 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### cool SMS ###
+application-cool-sms.yml
+
+### redis ###
+application-redis.yml
+
+### Private YML ###
+application-database.yml
+application-jwt.yml
+
+### gpt api ###
+.env
+
+# generated
+src/main/generated
+
+# git message
+.gitmessage.txt
