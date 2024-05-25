@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
 
     UserToken findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }
