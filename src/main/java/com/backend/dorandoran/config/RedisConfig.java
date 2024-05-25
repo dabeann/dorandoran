@@ -1,4 +1,4 @@
-package com.backend.dorandoran.redis;
+package com.backend.dorandoran.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;

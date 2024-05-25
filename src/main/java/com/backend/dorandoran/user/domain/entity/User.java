@@ -2,7 +2,7 @@ package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
 import com.backend.dorandoran.common.domain.UserRole;
-import com.backend.dorandoran.user.domain.request.LoginRequest;
+import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +32,7 @@ public class User extends BaseDateTimeEntity {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
-    public static User toUserEntity(LoginRequest request) {
+    public static User toUserEntity(SmsVerificationRequest request) {
         return User.builder()
                 .name(request.name())
                 .phoneNumber(request.phoneNumber())

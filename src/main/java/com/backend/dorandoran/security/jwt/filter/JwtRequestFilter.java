@@ -33,7 +33,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 Authentication authentication = jwtUtil.getAuthenticationByAccessToken(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else { // AccessToken이 유효하지 않음 -> 토큰 재할당
-                Long userId = Long.valueOf(jwtUtil.getAuthenticationByAccessToken(accessToken).getName()); // 확인 필요
+                Long userId = Long.valueOf(jwtUtil.getAuthenticationByAccessToken(accessToken).getName());
                 String reissuedAccessToken = jwtUtil.reissuedAccessToken(userId);
                 Authentication authentication = jwtUtil.getAuthenticationByAccessToken(reissuedAccessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

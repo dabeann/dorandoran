@@ -10,7 +10,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static com.backend.dorandoran.common.domain.ErrorCode.EXPIRED_TOKEN;
 
-@Slf4j
 @Component
 public class JwtUtil {
 
@@ -105,29 +103,10 @@ public class JwtUtil {
         UserToken userToken = userTokenService.findByUserId(userId);
         String refreshToken = userToken.getRefreshToken();
 
-        if (validateToken(refreshToken)) {
-            return TOKEN_PREFIX + createAccessToken(getAuthenticationByAccessToken(refreshToken));
-        } else {
-            Authentication authentication = getAuthenticationByUserId(userToken.getUserId());
-
-            String accessToken = createAccessToken(authentication); // Front
-            refreshToken = createRefreshToken(authentication); // DB
-
-            userToken.updateRefreshToken(refreshToken);
-            userTokenService.save(userToken);
-            return accessToken;
+        if (!validateToken(refreshToken)) {
+            throw new CommonException(EXPIRED_TOKEN);
         }
-    }
-
-    public String saveToken(Long userId) {
-        Authentication authentication = getAuthenticationByUserId(userId);
-
-        String accessToken = createAccessToken(authentication); // Front
-        String refreshToken = createRefreshToken(authentication); // DB
-
-        UserToken userToken = UserToken.toUserTokenEntity(userId, refreshToken);
-        userTokenService.save(userToken);
-        return accessToken;
+        return TOKEN_PREFIX + createAccessToken(getAuthenticationByAccessToken(refreshToken));
     }
 
     public Authentication getAuthenticationByAccessToken(String accessToken) {
@@ -142,7 +121,7 @@ public class JwtUtil {
                 new SimpleGrantedAuthority(claims.get(KEY_ROLE).toString()));
     }
 
-    private Authentication getAuthenticationByUserId(Long userId) {
+    public Authentication getAuthenticationByUserId(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
         return createAuthentication(userDetails);
     }

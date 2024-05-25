@@ -3,10 +3,8 @@ package com.backend.dorandoran.user.service;
 import com.backend.dorandoran.user.domain.entity.UserToken;
 import com.backend.dorandoran.user.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserTokenService {
