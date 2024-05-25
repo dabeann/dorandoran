@@ -18,4 +18,8 @@ public class UserTokenService {
     public void save(UserToken userToken) {
         userTokenRepository.save(userToken);
     }
+
+    public void deleteByUserId(Long userId) {
+        userTokenRepository.deleteByUserId(userId);
+    }
 }

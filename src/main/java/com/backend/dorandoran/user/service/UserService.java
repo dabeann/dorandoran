@@ -3,6 +3,7 @@ package com.backend.dorandoran.user.service;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.security.jwt.service.JwtUtil;
+import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserToken;
 import com.backend.dorandoran.user.domain.request.SmsSendRequest;
@@ -83,5 +84,11 @@ public class UserService {
         UserToken userToken = UserToken.toUserTokenEntity(user.getId(), refreshToken);
         userTokenService.save(userToken);
         return jwtUtil.createAccessToken(authentication);
+    }
+
+    @Transactional
+    public void logout() {
+        final Long userId = UserInfoUtil.getUserIdOrThrow();
+        userTokenService.deleteByUserId(userId);
     }
 }
