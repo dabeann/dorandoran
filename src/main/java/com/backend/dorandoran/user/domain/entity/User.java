@@ -2,8 +2,8 @@ package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
 import com.backend.dorandoran.common.domain.UserRole;
-import com.backend.dorandoran.user.domain.request.LoginRequest;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +42,7 @@ public class User extends BaseDateTimeEntity {
     @Column(name = "point_for_improvement", columnDefinition = "text[]")
     private String[] pointForImprovement = new String[0];
 
-    public static User toUserEntity(LoginRequest request) {
+    public static User toUserEntity(SmsVerificationRequest request) {
         return User.builder()
                 .name(request.name())
                 .phoneNumber(request.phoneNumber())

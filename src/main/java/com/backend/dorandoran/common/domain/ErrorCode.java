@@ -33,7 +33,7 @@ public enum ErrorCode {
 
     // user
     NOT_FOUND_USER(BAD_REQUEST, "존재하지 않는 회원입니다."),
-    NOT_FOUND_USERNAME(BAD_REQUEST, "가입 시 등록한 이름이 아닙니다.");
+    NOT_FOUND_USERNAME(BAD_REQUEST, "이름과 휴대폰번호가 일치하지 않아요.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
