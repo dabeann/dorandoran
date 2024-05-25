@@ -91,4 +91,12 @@ public class UserService {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         userTokenService.deleteByUserId(userId);
     }
+
+    @Transactional
+    public void signOut() {
+        final Long userId = UserInfoUtil.getUserIdOrThrow();
+        userTokenService.deleteByUserId(userId);
+        userRepository.deleteById(userId);
+        // TODO 사용자 관련 심리검사, 상담 등 삭제
+    }
 }

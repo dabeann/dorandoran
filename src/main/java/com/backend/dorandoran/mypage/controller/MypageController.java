@@ -35,4 +35,19 @@ class MypageController {
         userService.logout();
         return new ResponseEntity<>(new CommonResponse<>("로그아웃", "Success"), HttpStatus.OK);
     }
+
+    @Operation(summary = "summary : 회원 탈퇴",
+            description = """
+                    ## 요청 :
+                    - header(Authorization Bearer *토큰* (필수))
+                    ## 응답 :
+                    - 200, "Success"
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @PostMapping("/sign-out")
+    ResponseEntity<CommonResponse<String>> signOut() {
+        userService.signOut();
+        return new ResponseEntity<>(new CommonResponse<>("회원 탈퇴", "Success"), HttpStatus.OK);
+    }
 }
