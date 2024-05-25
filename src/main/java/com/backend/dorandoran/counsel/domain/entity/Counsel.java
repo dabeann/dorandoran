@@ -1,8 +1,8 @@
 package com.backend.dorandoran.counsel.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
-import com.backend.dorandoran.common.domain.CounselState;
-import com.backend.dorandoran.common.domain.CounselorType;
+import com.backend.dorandoran.common.domain.counsel.CounselState;
+import com.backend.dorandoran.common.domain.counsel.CounselorType;
 import com.backend.dorandoran.user.domain.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

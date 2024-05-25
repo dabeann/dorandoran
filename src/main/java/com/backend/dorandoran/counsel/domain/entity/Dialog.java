@@ -1,7 +1,7 @@
 package com.backend.dorandoran.counsel.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
-import com.backend.dorandoran.common.domain.DialogRole;
+import com.backend.dorandoran.common.domain.dialog.DialogRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

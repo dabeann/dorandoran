@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CounselResultResponse {
+
     private String result;
     private String summary;
     private List<CounselResultPsychotherapyContents> contents;
@@ -14,6 +15,7 @@ public class CounselResultResponse {
     @Getter
     @AllArgsConstructor
     public static class CounselResultPsychotherapyContents {
+
         private String title;
         private String link;
         private String thumbnailLink;
