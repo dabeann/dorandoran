@@ -96,21 +96,36 @@ def get_chat_response(counsel_id, user_message):
 
         # 대화 내역이 없을 경우 (첫 대화일 경우) 상담명 생성
         if not previous_conversations:
-            counsel_name = openai.chat.completions.create(
-                model=os.getenv('MODEL_NAME'),
-                messages=[
-                    {
-                        "role": "system",
-                        "content": f"다음 사용자 메시지와 상담자의 응답을 기반으로 상담명을 짧게 생성해주세요.\n사용자 메시지: {user_message}\n상담자 응답: {gpt_message}\n상담명:"
-                    }
-                ],
-                max_tokens=20,
-                temperature=0.7
-            ).choices[0].message.content
-            cursor.execute("""
-                UPDATE counsel SET title = %s WHERE counsel_id = %s
-            """, (counsel_name, counsel_id))
-            conn.commit()
+            while True:
+                counsel_name = openai.chat.completions.create(
+                    model=os.getenv('MODEL_NAME'),
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": f"다음 사용자 메시지와 상담자의 응답을 기반으로 상담 제목을 아주 짧게 생성해주세요. "
+                                       f"명사로 끝맺어주세요.\n"
+                                       f"사용자 메시지: {user_message}\n상담자 응답: {gpt_message}\n상담명:"
+                        }
+                    ],
+                    max_tokens=100,
+                    temperature=0.7
+                ).choices[0].message.content
+
+                # 중복 상담 제목 확인
+                cursor.execute("""
+                    SELECT COUNT(*) FROM counsel WHERE title = %s AND user_id = %s
+                """, (counsel_name, user_id))
+                count = cursor.fetchone()['count']
+
+                # 중복 없으면 상담 제목 update 후 종료
+                if count == 0:
+                    cursor.execute("""
+                        UPDATE counsel SET title = %s WHERE counsel_id = %s
+                    """, (counsel_name, counsel_id))
+                    conn.commit()
+                    break
+                else:
+                    continue
 
         return gpt_message
 
