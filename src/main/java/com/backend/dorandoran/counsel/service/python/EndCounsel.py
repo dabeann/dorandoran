@@ -50,7 +50,8 @@ def generate_chat_summary(counsel_id):
         history = [
             {"role": conv["role"], "content": conv["contents"]} for conv in previous_conversations
         ]
-        messages = [{"role": "system", "content": "다음은 노숙인과 상담봇의 대화 내역입니다. 이 대화의 주요 내용을 요약해 주세요:" + str(history)}]
+        messages = [{"role": "system", "content": "다음은 내담자와 상담자의 대화입니다. "
+                                                  "이 대화의 주요 내용을 150글자 이내로 간단히 요약해주세요.:" + str(history)}]
 
         # GPT 모델에게 요약 요청
         response = openai.chat.completions.create(
@@ -72,6 +73,21 @@ def generate_chat_summary(counsel_id):
         """, (summary, counsel_id))
 
         conn.commit()
+
+        # 심리점수 내기
+       # messages = [{"role": "system", "content": "점수내줘 어쩌고 뒤에는 대화 내역이야" + str(history)}]
+
+        # GPT 모델에게 점수 추출 요구
+        # 프롬포트 수정 필요
+       # response = openai.chat.completions.create(
+       #     model=os.getenv('MODEL_NAME'),
+       #     messages=messages,
+       #     max_tokens=150,
+       #     temperature=0.7,
+       #     n=1,
+       #     stop=None
+       # ).choices[0].message.content
+        #1,2,3이 기본 형식이고 만약 숫자랑 , 말고 다른거 나오면 처리해야됨
 
         return summary
 
