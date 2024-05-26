@@ -1,5 +1,5 @@
 package com.backend.dorandoran.common.domain.counsel;
 
 public enum CounselState {
-    PROCEED, FINISH
+    PROCEED_STATE, FINISH_STATE
 }
