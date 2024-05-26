@@ -1,8 +1,11 @@
 package com.backend.dorandoran.counsel.service;
 
 import com.backend.dorandoran.common.domain.Disease;
+import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.CounselState;
 import com.backend.dorandoran.common.domain.counsel.CounselorType;
+import com.backend.dorandoran.common.exception.CommonException;
+import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -46,7 +50,7 @@ public class CounselService {
                 "안녕하세요 " + user.getName() + "님! 어떤 이야기든 저에게 말해주세요.");
     }
 
-    public CounselResultResponse endCounsel(Long counselId, String summary) {
+    public CounselResultResponse endCounsel(String summary) {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         Optional<User> findUser = userRepository.findById(userId);
         User user = findUser.get();
@@ -70,5 +74,24 @@ public class CounselService {
 
         // TODO 심리 결과
         return new CounselResultResponse("result", summary, contents);
+    }
+
+    @Transactional
+    public void validateBeforeEndCounsel(Long counselId) {
+        UserInfoUtil.getUserIdOrThrow();
+
+        Optional<Counsel> findCounsel = counselRepository.findById(counselId);
+        CommonValidator.notPresentOrThrow(findCounsel, ErrorCode.NOT_FOUND_COUNSEL);
+        Counsel counsel = findCounsel.get();
+        if (counsel.getState() == CounselState.FINISH_STATE) {
+            throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
+        }
+        counsel.updateState(CounselState.FINISH_STATE);
+    }
+
+    public void validateBeforeChat(Long counselId) {
+        UserInfoUtil.getUserIdOrThrow();
+        Optional<Counsel> findCounsel = counselRepository.findById(counselId);
+        CommonValidator.notPresentOrThrow(findCounsel, ErrorCode.NOT_FOUND_COUNSEL);
     }
 }
