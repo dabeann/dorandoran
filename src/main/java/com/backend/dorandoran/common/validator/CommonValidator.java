@@ -4,6 +4,7 @@ import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import jakarta.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
@@ -30,6 +31,12 @@ public class CommonValidator {
 
     public static void notNullOrThrow(@Nullable Object object, ErrorCode errorCode) {
         if (object == null) {
+            throw new CommonException(errorCode);
+        }
+    }
+
+    public static void notPresentOrThrow(Optional<?> optional, ErrorCode errorCode) {
+        if (optional.isEmpty()) {
             throw new CommonException(errorCode);
         }
     }
