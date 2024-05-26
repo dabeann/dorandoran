@@ -40,6 +40,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/chat")
     ResponseEntity<CommonResponse<String>> getChatResult(@RequestBody DialogRequestResponse request) {
+        counselService.validateBeforeChat(request.counselId());
+
         String counselId = String.valueOf(request.counselId());
         String userMessage = request.message();
 
@@ -103,7 +105,9 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/end/{counselId}")
     ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") Long counselId) {
+        counselService.validateBeforeEndCounsel(counselId);
         try {
+
             ProcessBuilder processBuilder = new ProcessBuilder("python",
                     "src/main/java/com/backend/dorandoran/counsel/service/python/EndCounsel.py",
                     String.valueOf(counselId));
@@ -130,9 +134,9 @@ class CounselController {
             String summary = output.toString().trim();
 
             return new ResponseEntity<>(new CommonResponse<>("상담 결과",
-                    counselService.endCounsel(counselId, summary)), HttpStatus.OK);
+                    counselService.endCounsel(summary)), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new CommonResponse<>("Error: " + e.toString(), null),
+            return new ResponseEntity<>(new CommonResponse<>("Error: " + e, null),
                     HttpStatus.BAD_REQUEST);
         }
     }
