@@ -53,4 +53,8 @@ public class Counsel extends BaseDateTimeEntity {
 
     @Column(name = "title")
     private String title;
+
+    public void updateState(CounselState state) {
+        this.state = state;
+    }
 }
