@@ -78,20 +78,18 @@ public class CounselService {
 
     @Transactional
     public void validateBeforeEndCounsel(Long counselId) {
-        UserInfoUtil.getUserIdOrThrow();
+        Counsel counsel = validateBeforeChat(counselId);
+        counsel.updateState(CounselState.FINISH_STATE);
+    }
 
+    public Counsel validateBeforeChat(Long counselId) {
+        UserInfoUtil.getUserIdOrThrow();
         Optional<Counsel> findCounsel = counselRepository.findById(counselId);
         CommonValidator.notPresentOrThrow(findCounsel, ErrorCode.NOT_FOUND_COUNSEL);
         Counsel counsel = findCounsel.get();
         if (counsel.getState() == CounselState.FINISH_STATE) {
             throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
         }
-        counsel.updateState(CounselState.FINISH_STATE);
-    }
-
-    public void validateBeforeChat(Long counselId) {
-        UserInfoUtil.getUserIdOrThrow();
-        Optional<Counsel> findCounsel = counselRepository.findById(counselId);
-        CommonValidator.notPresentOrThrow(findCounsel, ErrorCode.NOT_FOUND_COUNSEL);
+        return counsel;
     }
 }
