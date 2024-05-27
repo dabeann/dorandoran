@@ -33,7 +33,7 @@ jobs:
           find src
         shell: bash
 
-      # Gradle 권한 부여
+      # 빌드를 위한 Gradlew 권한 부여
       - name: Grant permission for gradlew
         run: chmod +x ./gradlew
 
