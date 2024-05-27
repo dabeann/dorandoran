@@ -38,10 +38,6 @@ public class User extends BaseDateTimeEntity {
     @Column(name = "diseases", columnDefinition = "text[]")
     private String[] diseases = new String[0];
 
-    @Type(StringArrayType.class)
-    @Column(name = "point_for_improvement", columnDefinition = "text[]")
-    private String[] pointForImprovement = new String[0];
-
     public static User toUserEntity(SmsVerificationRequest request) {
         return User.builder()
                 .name(request.name())
