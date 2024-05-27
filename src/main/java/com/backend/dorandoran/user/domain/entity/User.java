@@ -2,12 +2,14 @@ package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
 import com.backend.dorandoran.common.domain.UserRole;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 @Builder
 @Getter
@@ -31,6 +33,10 @@ public class User extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRole role;
+
+    @Type(StringArrayType.class)
+    @Column(name = "diseases", columnDefinition = "text[]")
+    private String[] diseases = new String[0];
 
     public static User toUserEntity(SmsVerificationRequest request) {
         return User.builder()

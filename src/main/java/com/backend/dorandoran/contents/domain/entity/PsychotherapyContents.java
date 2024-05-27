@@ -1,44 +1,43 @@
-package com.backend.dorandoran.counsel.domain.entity;
+package com.backend.dorandoran.contents.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
-import com.backend.dorandoran.common.domain.dialog.DialogRole;
+import com.backend.dorandoran.common.domain.Disease;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "dialog")
+@Table(name = "psychotherapy_contents")
 @Entity
-public class Dialog extends BaseDateTimeEntity {
+public class PsychotherapyContents extends BaseDateTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dialog_id")
+    @Column(name = "psychotherapy_contents_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "counsel_id")
-    private Counsel counsel;
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @Column(name = "contents", nullable = false, length = 1024)
-    private String contents;
+    @Column(name = "link", nullable = false)
+    private String link;
+
+    @Column(name = "thumbnail_link", nullable = false)
+    private String thumbnailLink;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private DialogRole role;
+    @Column(name = "category", nullable = false)
+    private Disease category;
 }

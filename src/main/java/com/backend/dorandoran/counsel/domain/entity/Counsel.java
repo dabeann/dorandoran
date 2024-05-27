@@ -1,8 +1,8 @@
 package com.backend.dorandoran.counsel.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
-import com.backend.dorandoran.common.domain.CounselState;
-import com.backend.dorandoran.common.domain.CounselorType;
+import com.backend.dorandoran.common.domain.counsel.CounselState;
+import com.backend.dorandoran.common.domain.counsel.CounselorType;
 import com.backend.dorandoran.user.domain.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,9 +48,13 @@ public class Counsel extends BaseDateTimeEntity {
     @Column(name = "result")
     private String result;
 
-    @Column(name = "summary")
+    @Column(name = "summary", length = 1024)
     private String summary;
 
     @Column(name = "title")
     private String title;
+
+    public void updateState(CounselState state) {
+        this.state = state;
+    }
 }
