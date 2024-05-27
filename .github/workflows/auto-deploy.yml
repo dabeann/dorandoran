@@ -53,4 +53,4 @@ jobs:
       - name: Execute Jar File
         run: |
           sudo nohup java -jar build/libs/dorandoran-0.0.1-SNAPSHOT.jar 1>/root/nohup-log/output.log 2>/root/nohup-log/error.log &
-          sleep 10
+          sleep 20
