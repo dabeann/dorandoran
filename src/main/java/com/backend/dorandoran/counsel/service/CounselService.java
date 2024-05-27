@@ -9,9 +9,9 @@ import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
-import com.backend.dorandoran.counsel.domain.request.DialogRequestResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse.CounselResultPsychotherapyContents;
+import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
@@ -33,7 +33,7 @@ public class CounselService {
     private final CounselRepository counselRepository;
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
 
-    public DialogRequestResponse startCounsel() {
+    public StartCounselResponse startCounsel() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         Optional<User> findUser = userRepository.findById(userId);
         User user = findUser.get();
@@ -46,7 +46,7 @@ public class CounselService {
         Counsel savedCounsel = counselRepository.save(counsel);
 
         // TODO 기본 멘트 바뀌면 바꾸기
-        return new DialogRequestResponse(savedCounsel.getId(),
+        return new StartCounselResponse(savedCounsel.getId(),
                 "안녕하세요 " + user.getName() + "님! 어떤 이야기든 저에게 말해주세요.");
     }
 

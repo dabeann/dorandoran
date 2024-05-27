@@ -2,8 +2,9 @@ package com.backend.dorandoran.counsel.controller;
 
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
-import com.backend.dorandoran.counsel.domain.request.DialogRequestResponse;
+import com.backend.dorandoran.counsel.domain.request.ChatRequest;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
+import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +40,7 @@ class CounselController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/chat")
-    ResponseEntity<CommonResponse<String>> getChatResult(@RequestBody DialogRequestResponse request) {
+    ResponseEntity<CommonResponse<String>> getChatResult(@RequestBody ChatRequest request) {
         counselService.validateBeforeChat(request.counselId());
 
         String counselId = String.valueOf(request.counselId());
@@ -87,7 +88,7 @@ class CounselController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/start")
-    ResponseEntity<CommonResponse<DialogRequestResponse>> startCounsel() {
+    ResponseEntity<CommonResponse<StartCounselResponse>> startCounsel() {
         return new ResponseEntity<>(new CommonResponse<>("상담 시작", counselService.startCounsel()), HttpStatus.OK);
     }
 
