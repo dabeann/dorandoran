@@ -39,7 +39,7 @@ class ContentsController {
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @GetMapping("/main/{category}")
+    @GetMapping(value = {"/main/{category}", "/main"})
     ResponseEntity<CommonResponse<ContentsResponse>> getMainContents(@PathVariable(name = "category", required = false) String category) {
         return new ResponseEntity<>(new CommonResponse<>("콘텐츠 메인", contentsService.getMainContents(category)), HttpStatus.OK);
     }
