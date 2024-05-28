@@ -37,7 +37,10 @@ public enum ErrorCode {
 
     // counsel
     NOT_FOUND_COUNSEL(BAD_REQUEST, "존재하지 않는 상담입니다."),
-    ALREADY_CLOSED_COUNSEL(BAD_REQUEST, "이미 종료된 상담입니다.");
+    ALREADY_CLOSED_COUNSEL(BAD_REQUEST, "이미 종료된 상담입니다."),
+
+    // disease
+    NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
