@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PsychotherapyContentsRepository extends JpaRepository<PsychotherapyContents, Long> {
     List<PsychotherapyContents> findAllByCategoryIn(List<Disease> categories);
+
+    List<PsychotherapyContents> findAllByCategory(Disease disease);
 }
