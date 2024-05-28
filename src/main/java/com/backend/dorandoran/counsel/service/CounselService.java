@@ -64,16 +64,8 @@ public class CounselService {
         Collections.shuffle(contentsByCategories);
         List<PsychotherapyContents> limitThreeContents = contentsByCategories.stream().limit(3).toList();
 
-        List<CounselResultPsychotherapyContents> contents = new ArrayList<>();
-        for (PsychotherapyContents content : limitThreeContents) {
-            contents.add(new CounselResultPsychotherapyContents(
-                    content.getTitle(),
-                    content.getLink(),
-                    content.getThumbnailLink()));
-        }
-
         // TODO 심리 결과
-        return new CounselResultResponse("result", summary, contents);
+        return new CounselResultResponse("result", summary, limitThreeContents);
     }
 
     @Transactional
