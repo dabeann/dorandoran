@@ -2,7 +2,7 @@ package com.backend.dorandoran.contents.service;
 
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
-import com.backend.dorandoran.common.exception.CommonException;
+import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.domain.response.ContentsResponse;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
@@ -35,7 +35,7 @@ public class ContentsService {
                 .toList();
 
         List<PsychotherapyContents> psychotherapyContentsList;
-        if (category.isEmpty()) {
+        if (category == null) {
             // null이면 "당신을 위한 콘텐츠"
             psychotherapyContentsList = getPersonalizedPsychotherapyContentsList(diseasesList);
         } else {
@@ -47,12 +47,8 @@ public class ContentsService {
     }
 
     private List<PsychotherapyContents> getPsychotherapyContentsListWithCategory(String category) {
-        Disease disease;
-        try {
-            disease = Disease.valueOfKoreanName(category);
-        } catch (Exception e) {
-            throw new CommonException(ErrorCode.NOT_FOUND_DISEASE);
-        }
+        Disease disease = Disease.valueOfKoreanName(category);
+        CommonValidator.notNullOrThrow(disease, ErrorCode.NOT_FOUND_DISEASE);
         return psychotherapyContentsRepository.findAllByCategory(disease);
     }
 
