@@ -30,8 +30,9 @@ class ContentsController {
                     - string {category} (필수X)
                         - '당신을 위한 콘텐츠' 일 경우 null(빈 값)
                         - 그 외 경우 병명 넘기기 (우울증, 스트레스, 불안증, 알코올_중독, 흡연_중독)
+                        - 심리검사 안 한 경우 null 보내면 -> '우울증' 심리치료 콘텐츠 나옴
                     ## 응답 :
-                    - string 명언
+                    - string 명언 (심리검사 안 한 경우 null)
                     - 심리 치료 리스트
                         - string 제목
                         - string 링크
