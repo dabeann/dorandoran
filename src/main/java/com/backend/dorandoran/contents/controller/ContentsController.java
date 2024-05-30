@@ -3,6 +3,7 @@ package com.backend.dorandoran.contents.controller;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.contents.domain.response.ContentsResponse;
+import com.backend.dorandoran.contents.domain.response.MeditationResponse;
 import com.backend.dorandoran.contents.service.ContentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,5 +44,22 @@ class ContentsController {
     @GetMapping(value = {"/main/{category}", "/main"})
     ResponseEntity<CommonResponse<ContentsResponse>> getMainContents(@PathVariable(name = "category", required = false) String category) {
         return new ResponseEntity<>(new CommonResponse<>("콘텐츠 메인", contentsService.getMainContents(category)), HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 명상 시청",
+            description = """
+                    ## 요청 :
+                    - header token (필수)
+                    - string {duration} (필수)
+                    ## 응답 :
+                    - string 제목
+                    - string 링크
+                    - string 썸네일
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/meditation/{duration}")
+    ResponseEntity<CommonResponse<MeditationResponse>> getMeditationContent(@PathVariable(name = "duration") Integer duration) {
+        return new ResponseEntity<>(new CommonResponse<>("명상 시청", contentsService.getMeditationContent(duration)), HttpStatus.OK);
     }
 }
