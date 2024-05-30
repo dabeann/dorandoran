@@ -40,7 +40,10 @@ public enum ErrorCode {
     ALREADY_CLOSED_COUNSEL(BAD_REQUEST, "이미 종료된 상담입니다."),
 
     // disease
-    NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다.");
+    NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다."),
+
+    // meditation duration
+    NOT_FOUND_MEDITATION_DURATION(BAD_REQUEST, "존재하지 않는 명상 기간입니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
