@@ -2,10 +2,14 @@ package com.backend.dorandoran.contents.service;
 
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
+import com.backend.dorandoran.common.domain.MeditationDuration;
 import com.backend.dorandoran.common.validator.CommonValidator;
+import com.backend.dorandoran.contents.domain.entity.MeditationContents;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.domain.entity.Quotation;
 import com.backend.dorandoran.contents.domain.response.ContentsResponse;
+import com.backend.dorandoran.contents.domain.response.MeditationResponse;
+import com.backend.dorandoran.contents.repository.MeditationContentsRepository;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.contents.repository.QuotationRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
@@ -26,6 +30,7 @@ public class ContentsService {
     private final UserRepository userRepository;
     private final QuotationRepository quotationRepository;
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
+    private final MeditationContentsRepository meditationContentsRepository;
 
     @Transactional
     public void updateTodayQuotation() {
@@ -77,5 +82,14 @@ public class ContentsService {
                 .findAllByCategoryIn(diseaseList);
         Collections.shuffle(contentsByCategories);
         return contentsByCategories.stream().limit(5).toList();
+    }
+
+    public MeditationResponse getMeditationContent(Integer duration) {
+        UserInfoUtil.getUserIdOrThrow();
+        MeditationDuration meditationDuration = MeditationDuration.valueOfMinutes(duration);
+        CommonValidator.notNullOrThrow(meditationDuration, ErrorCode.NOT_FOUND_MEDITATION_DURATION);
+        MeditationContents meditationContents = meditationContentsRepository.findFirstByDurationCategory(
+                meditationDuration);
+        return new MeditationResponse(meditationContents);
     }
 }
