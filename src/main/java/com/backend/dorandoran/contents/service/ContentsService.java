@@ -54,21 +54,22 @@ public class ContentsService {
             quotation = user.getTodayQuotation().getContents();
         }
 
-        List<PsychotherapyContents> psychotherapyContentsList;
+        List<PsychotherapyContents> psychotherapyContentsList = getPsychotherapyContentsList(user, category);
+
+        return new ContentsResponse(quotation, psychotherapyContentsList);
+    }
+
+    private List<PsychotherapyContents> getPsychotherapyContentsList(User user, String category) {
         if (user.getDiseases() == null && category == null) {
-            // 심리검사 X
-            psychotherapyContentsList = getPsychotherapyContentsListWithCategory("우울증");
+            return getPsychotherapyContentsListWithCategory(Disease.DEPRESSION.getKoreanName());
         } else if (category == null) {
-            // "당신을 위한 콘텐츠"
             List<Disease> diseasesList = Arrays.stream(user.getDiseases())
                     .map(Disease::valueOf)
                     .toList();
-            psychotherapyContentsList = getPersonalizedPsychotherapyContentsList(diseasesList);
+            return getPersonalizedPsychotherapyContentsList(diseasesList);
         } else {
-            psychotherapyContentsList = getPsychotherapyContentsListWithCategory(category);
+            return getPsychotherapyContentsListWithCategory(category);
         }
-
-        return new ContentsResponse(quotation, psychotherapyContentsList);
     }
 
     private List<PsychotherapyContents> getPsychotherapyContentsListWithCategory(String category) {
