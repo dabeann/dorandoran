@@ -1,5 +1,9 @@
 package com.backend.dorandoran.common.domain;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public enum MeditationDuration {
     THREE_MINUTES(3),
     FIVE_MINUTES(5),
@@ -15,5 +19,12 @@ public enum MeditationDuration {
 
     public int getMinutes() {
         return minutes;
+    }
+
+    private static final Map<Integer, MeditationDuration> BY_MINUTES =
+            Stream.of(values()).collect(Collectors.toMap(MeditationDuration::getMinutes, e -> e));
+
+    public static MeditationDuration valueOfMinutes(Integer minutes) {
+        return BY_MINUTES.get(minutes);
     }
 }
