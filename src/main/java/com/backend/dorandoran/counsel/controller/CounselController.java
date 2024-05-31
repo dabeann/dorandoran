@@ -32,6 +32,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 채팅",
             description = """
                     ## 요청 :
+                    - header token (필수)
                     - Long counselId (필수)
                     - String message (필수)
                     ## 응답 :
@@ -80,7 +81,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 시작",
             description = """
                     ## 요청 :
-                    - 토큰 (필수)
+                    - header token (필수)
                     ## 응답 :
                     - Long counselId
                     - String message
@@ -95,7 +96,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 종료",
             description = """
                     ## 요청 :
-                    - 토큰 (필수)
+                    - header token (필수)
                     - {counselId} (필수)
                     ## 응답 :
                     - String result

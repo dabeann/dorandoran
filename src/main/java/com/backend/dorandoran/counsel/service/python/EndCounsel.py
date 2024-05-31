@@ -75,18 +75,20 @@ def generate_chat_summary(counsel_id):
         conn.commit()
 
         # 심리점수 내기
-       # messages = [{"role": "system", "content": "점수내줘 어쩌고 뒤에는 대화 내역이야" + str(history)}]
+        messages = [{"role": "system", "content": "점수내줘 어쩌고 뒤에는 대화 내역이야" + str(history)}]
 
         # GPT 모델에게 점수 추출 요구
         # 프롬포트 수정 필요
-       # response = openai.chat.completions.create(
-       #     model=os.getenv('MODEL_NAME'),
-       #     messages=messages,
-       #     max_tokens=150,
-       #     temperature=0.7,
-       #     n=1,
-       #     stop=None
-       # ).choices[0].message.content
+        response = openai.chat.completions.create(
+            model=os.getenv('MODEL_NAME'),
+            messages=messages,
+            max_tokens=150,
+            temperature=0.7,
+            n=1,
+            stop=None
+        ).choices[0].message.content
+        print(response)
+        print("----")
         #1,2,3이 기본 형식이고 만약 숫자랑 , 말고 다른거 나오면 처리해야됨
 
         return summary

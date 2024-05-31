@@ -10,13 +10,11 @@ import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
-import com.backend.dorandoran.counsel.domain.response.CounselResultResponse.CounselResultPsychotherapyContents;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -64,16 +62,8 @@ public class CounselService {
         Collections.shuffle(contentsByCategories);
         List<PsychotherapyContents> limitThreeContents = contentsByCategories.stream().limit(3).toList();
 
-        List<CounselResultPsychotherapyContents> contents = new ArrayList<>();
-        for (PsychotherapyContents content : limitThreeContents) {
-            contents.add(new CounselResultPsychotherapyContents(
-                    content.getTitle(),
-                    content.getLink(),
-                    content.getThumbnailLink()));
-        }
-
         // TODO 심리 결과
-        return new CounselResultResponse("result", summary, contents);
+        return new CounselResultResponse("result", summary, limitThreeContents);
     }
 
     @Transactional
