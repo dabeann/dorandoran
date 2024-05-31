@@ -9,6 +9,7 @@ import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
+import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
@@ -81,5 +82,13 @@ public class CounselService {
             throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
         }
         return counsel;
+    }
+
+    public List<CounselHistoryResponse> getCounselHistory(String state) {
+        UserInfoUtil.getUserIdOrThrow();
+        CounselState counselState = CounselState.valueOfKoreanState(state);
+        CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
+        List<Counsel> counselListByState = counselRepository.findAllByStateOrderByCreatedDateTimeDesc(counselState);
+        return CounselHistoryResponse.fromCounselList(counselListByState);
     }
 }
