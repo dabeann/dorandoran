@@ -3,6 +3,7 @@ package com.backend.dorandoran.counsel.controller;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
+import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.service.CounselService;
@@ -12,9 +13,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -141,5 +144,27 @@ class CounselController {
             return new ResponseEntity<>(new CommonResponse<>("Error: " + e, null),
                     HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Operation(summary = "summary : 상담 내역",
+            description = """
+                    ## 요청 :
+                    - header token (필수)
+                    - {state} (필수)
+                        - "진행중"
+                        - "종료"
+                    ## 응답 :
+                    - List [{Long counselId,
+                               String title,
+                               LocalDate date}, ...]
+                    - 해당 상담이 하나도 없다면 empty list 반환
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/history/{state}")
+    ResponseEntity<CommonResponse<List<CounselHistoryResponse>>> getCounselHistory(
+            @PathVariable("state") String state) {
+        return new ResponseEntity<>(new CommonResponse<>("상담 내역", counselService.getCounselHistory(state)),
+                HttpStatus.OK);
     }
 }
