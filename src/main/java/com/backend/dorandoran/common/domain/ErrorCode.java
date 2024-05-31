@@ -34,13 +34,12 @@ public enum ErrorCode {
     // user
     NOT_FOUND_USER(BAD_REQUEST, "존재하지 않는 회원입니다."),
     NOT_FOUND_USERNAME(BAD_REQUEST, "이름과 휴대폰번호가 일치하지 않아요."),
+    NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다."),
 
     // counsel
     NOT_FOUND_COUNSEL(BAD_REQUEST, "존재하지 않는 상담입니다."),
     ALREADY_CLOSED_COUNSEL(BAD_REQUEST, "이미 종료된 상담입니다."),
-
-    // disease
-    NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다."),
+    NOT_FOUND_COUNSEL_STATE(BAD_REQUEST, "존재하지 않는 상담 상태입니다."),
 
     // meditation duration
     NOT_FOUND_MEDITATION_DURATION(BAD_REQUEST, "존재하지 않는 명상 기간입니다.");
