@@ -9,10 +9,13 @@ import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
+import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
+import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
+import com.backend.dorandoran.counsel.repository.DialogRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
@@ -31,11 +34,11 @@ public class CounselService {
     private final UserRepository userRepository;
     private final CounselRepository counselRepository;
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
+    private final DialogRepository dialogRepository;
 
     public StartCounselResponse startCounsel() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
-        Optional<User> findUser = userRepository.findById(userId);
-        User user = findUser.get();
+        User user = userRepository.findById(userId).get();
 
         Counsel counsel = Counsel.builder()
                 .user(user)
@@ -51,8 +54,7 @@ public class CounselService {
 
     public CounselResultResponse endCounsel(String summary) {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
-        Optional<User> findUser = userRepository.findById(userId);
-        User user = findUser.get();
+        User user = userRepository.findById(userId).get();
 
         List<Disease> diseasesList = Arrays.stream(user.getDiseases())
                 .map(Disease::valueOf)
@@ -75,9 +77,8 @@ public class CounselService {
 
     public Counsel validateBeforeChat(Long counselId) {
         UserInfoUtil.getUserIdOrThrow();
-        Optional<Counsel> findCounsel = counselRepository.findById(counselId);
-        CommonValidator.notPresentOrThrow(findCounsel, ErrorCode.NOT_FOUND_COUNSEL);
-        Counsel counsel = findCounsel.get();
+        Counsel counsel = counselRepository.findById(counselId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
         if (counsel.getState() == CounselState.FINISH_STATE) {
             throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
         }
@@ -90,5 +91,15 @@ public class CounselService {
         CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
         List<Counsel> counselListByState = counselRepository.findAllByStateOrderByCreatedDateTimeDesc(counselState);
         return CounselHistoryResponse.fromCounselList(counselListByState);
+    }
+
+    public ProceedCounselResponse getProceedCounsel(Long counselId) {
+        UserInfoUtil.getUserIdOrThrow();
+        Counsel counsel = counselRepository.findById(counselId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
+        if (counsel.getState() == CounselState.FINISH_STATE) {
+            throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
+        }
+        return new ProceedCounselResponse(counselId, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
     }
 }

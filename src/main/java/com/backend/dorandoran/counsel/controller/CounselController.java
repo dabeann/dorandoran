@@ -5,6 +5,7 @@ import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
+import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -150,7 +151,7 @@ class CounselController {
             description = """
                     ## 요청 :
                     - header token (필수)
-                    - {state} (필수)
+                    - String {state} (필수)
                         - "진행중"
                         - "종료"
                     ## 응답 :
@@ -165,6 +166,25 @@ class CounselController {
     ResponseEntity<CommonResponse<List<CounselHistoryResponse>>> getCounselHistory(
             @PathVariable("state") String state) {
         return new ResponseEntity<>(new CommonResponse<>("상담 내역", counselService.getCounselHistory(state)),
+                HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 진행중 상담 클릭",
+            description = """
+                    ## 요청 :
+                    - header token (필수)
+                    - Long {counselId} (필수)
+                    ## 응답 :
+                    - Long counselId
+                    - messages [{String role, String message}, ...]
+                        - role: "상담원" or "내담자"
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/proceed/{counselId}")
+    ResponseEntity<CommonResponse<ProceedCounselResponse>> getProceedCounsel(
+            @PathVariable("counselId") Long counselId) {
+        return new ResponseEntity<>(new CommonResponse<>("진행중 상담 클릭", counselService.getProceedCounsel(counselId)),
                 HttpStatus.OK);
     }
 }
