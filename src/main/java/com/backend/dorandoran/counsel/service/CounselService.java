@@ -12,6 +12,7 @@ import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
+import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
@@ -101,5 +102,15 @@ public class CounselService {
             throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
         }
         return new ProceedCounselResponse(counselId, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
+    }
+
+    public FinishCounselResponse getFinishCounsel(Long counselId) {
+        UserInfoUtil.getUserIdOrThrow();
+        Counsel counsel = counselRepository.findById(counselId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
+        if (counsel.getState() == CounselState.PROCEED_STATE) {
+            throw new CommonException(ErrorCode.STILL_PROCEED_COUNSEL);
+        }
+        return new FinishCounselResponse(counsel, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
     }
 }
