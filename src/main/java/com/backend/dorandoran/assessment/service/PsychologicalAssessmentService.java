@@ -38,8 +38,7 @@ public class PsychologicalAssessmentService {
 
     public Boolean hasPsychologicalAssessmentResult() {
         Long userId = UserInfoUtil.getUserIdOrThrow();
-        Optional<UserMentalState> userMentalState = userMentalStateRepository.findByUserId(userId);
-        return userMentalState.isPresent();
+        return userMentalStateRepository.existsByUserId(userId);
     }
 
     @Transactional
