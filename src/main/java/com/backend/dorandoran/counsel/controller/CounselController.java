@@ -156,15 +156,17 @@ class CounselController {
                         - "진행중"
                         - "종료"
                     ## 응답 :
-                    - List [{Long counselId,
+                    - boolean isPsychTestDone 심리 검사 여부
+                    - boolean hasCounselHistory 상담(종료,진행중 모두) 있는지 여부
+                    - List counselHistories [{Long counselId,
                                String title,
                                LocalDate date}, ...]
-                    - 해당 상담이 하나도 없다면 empty list 반환
+                    - 해당 상태의 상담이 하나도 없다면 empty list 반환
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @GetMapping("/history/{state}")
-    ResponseEntity<CommonResponse<List<CounselHistoryResponse>>> getCounselHistory(
+    ResponseEntity<CommonResponse<CounselHistoryResponse>> getCounselHistory(
             @PathVariable("state") String state) {
         return new ResponseEntity<>(new CommonResponse<>("상담 내역", counselService.getCounselHistory(state)),
                 HttpStatus.OK);

@@ -70,7 +70,7 @@ public class CounselService {
         int totalScore = Integer.parseInt(scorePart[0].trim()) +
                 Integer.parseInt(scorePart[1].trim()) +
                 Integer.parseInt(scorePart[2].trim());
-
+        // TODO 사용자 심리 상태 entity에 추가하기
         String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
         result = user.getName() + result;
         counselRepository.findById(counselId).get().updateResult(result);
@@ -94,13 +94,19 @@ public class CounselService {
         return counsel;
     }
 
-    public List<CounselHistoryResponse> getCounselHistory(String state) {
-        UserInfoUtil.getUserIdOrThrow();
+    public CounselHistoryResponse getCounselHistory(String state) {
+        final Long userId = UserInfoUtil.getUserIdOrThrow();
+        User user = userRepository.findById(userId).get();
+        boolean isPsychTestDone = user.getDiseases() != null;
+
         CounselState counselState = CounselState.valueOfKoreanState(state);
         CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
-        // TODO 심리검사 여부에 따른 결과 반환 다르게!!
-        List<Counsel> counselListByState = counselRepository.findAllByStateOrderByCreatedDateTimeDesc(counselState);
-        return CounselHistoryResponse.fromCounselList(counselListByState);
+        List<Counsel> counselListByState = counselRepository.findAllByStateAndUserOrderByCreatedDateTimeDesc(
+                counselState, user);
+
+        boolean hasCounselHistory = !counselRepository.findAllByUser(user).isEmpty();
+        return new CounselHistoryResponse(isPsychTestDone, hasCounselHistory,
+                CounselHistoryResponse.CounselHistory.fromCounselList(counselListByState));
     }
 
     public ProceedCounselResponse getProceedCounsel(Long counselId) {

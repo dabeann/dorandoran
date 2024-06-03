@@ -5,17 +5,23 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record CounselHistoryResponse (
-        Long counselId,
-        String title,
-        LocalDate date
+        boolean isPsychTestDone,
+        boolean hasCounselHistory,
+        List<CounselHistory> counselHistories
 ){
-    public static List<CounselHistoryResponse> fromCounselList(List<Counsel> counselList) {
-        return counselList.stream()
-                .map(counsel -> new CounselHistoryResponse(
-                        counsel.getId(),
-                        counsel.getTitle(),
-                        counsel.getCreatedDateTime().toLocalDate()
-                ))
-                .toList();
+    public record CounselHistory(
+            Long counselId,
+            String title,
+            LocalDate date
+    ) {
+        public static List<CounselHistory> fromCounselList(List<Counsel> counselList) {
+            return counselList.stream()
+                    .map(counsel -> new CounselHistory(
+                            counsel.getId(),
+                            counsel.getTitle(),
+                            counsel.getCreatedDateTime().toLocalDate()
+                    ))
+                    .toList();
+        }
     }
 }
