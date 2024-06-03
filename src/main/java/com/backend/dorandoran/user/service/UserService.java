@@ -1,9 +1,11 @@
 package com.backend.dorandoran.user.service;
 
+import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.security.jwt.service.JwtUtil;
 import com.backend.dorandoran.security.service.UserInfoUtil;
+import com.backend.dorandoran.user.domain.LoginResponse;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserToken;
 import com.backend.dorandoran.user.domain.request.SmsSendRequest;
@@ -29,6 +31,7 @@ public class UserService {
     private final SmsVerificationRepository smsVerificationRepository;
     private final UserTokenService userTokenService;
     private final UserQueryRepository userQueryRepository;
+    private final UserMentalStateRepository userMentalStateRepository;
 
     @Transactional(readOnly = true)
     public void sendSms(SmsSendRequest request) {
@@ -47,16 +50,22 @@ public class UserService {
         }
     }
 
-    public String verifySms(SmsVerificationRequest request) {
+    public LoginResponse verifySms(SmsVerificationRequest request) {
         String redisVerificationCode = smsVerificationRepository.getSmsVerificationCode(request.phoneNumber());
+        throwAuthExceptions(request, redisVerificationCode);
+        smsVerificationRepository.removeSmsVerificationCode(request.phoneNumber());
+
+        String accessToken = joinOrLogin(request);
+        Long userId = Long.parseLong(jwtUtil.getAuthenticationByAccessToken(accessToken).getName());
+        return new LoginResponse(accessToken, userMentalStateRepository.existsByUserId(userId));
+    }
+
+    private void throwAuthExceptions(SmsVerificationRequest request, String redisVerificationCode) {
         if (!smsVerificationRepository.hasKey(request.phoneNumber()) || !StringUtils.hasText(redisVerificationCode)) {
             throw new CommonException(ErrorCode.EXPIRED_AUTH_CODE);
         } else if (!redisVerificationCode.equals(request.verificationCode())) {
             throw new CommonException(ErrorCode.WRONG_AUTH_CODE);
         }
-        smsVerificationRepository.removeSmsVerificationCode(request.phoneNumber());
-
-        return joinOrLogin(request);
     }
 
     @Transactional
