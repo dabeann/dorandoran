@@ -2,6 +2,7 @@ package com.backend.dorandoran.counsel.service;
 
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
+import com.backend.dorandoran.common.domain.counsel.CounselResult;
 import com.backend.dorandoran.common.domain.counsel.CounselState;
 import com.backend.dorandoran.common.domain.counsel.CounselorType;
 import com.backend.dorandoran.common.exception.CommonException;
@@ -9,7 +10,6 @@ import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
-import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
@@ -23,7 +23,6 @@ import com.backend.dorandoran.user.repository.UserRepository;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +52,8 @@ public class CounselService {
                 "안녕하세요 " + user.getName() + "님! 어떤 이야기든 저에게 말해주세요.");
     }
 
-    public CounselResultResponse endCounsel(String summary) {
+    @Transactional
+    public CounselResultResponse endCounsel(Long counselId, String resultWithSummary) {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         User user = userRepository.findById(userId).get();
 
@@ -66,8 +66,16 @@ public class CounselService {
         Collections.shuffle(contentsByCategories);
         List<PsychotherapyContents> limitThreeContents = contentsByCategories.stream().limit(3).toList();
 
-        // TODO 심리 결과
-        return new CounselResultResponse("result", summary, limitThreeContents);
+        String[] scorePart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
+        int totalScore = Integer.parseInt(scorePart[0].trim()) +
+                Integer.parseInt(scorePart[1].trim()) +
+                Integer.parseInt(scorePart[2].trim());
+
+        String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
+        result = user.getName() + result;
+        counselRepository.findById(counselId).get().updateResult(result);
+        String summary = resultWithSummary.trim().split("\\r\\n")[1];
+        return new CounselResultResponse(result, summary, limitThreeContents);
     }
 
     @Transactional
@@ -90,6 +98,7 @@ public class CounselService {
         UserInfoUtil.getUserIdOrThrow();
         CounselState counselState = CounselState.valueOfKoreanState(state);
         CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
+        // TODO 심리검사 여부에 따른 결과 반환 다르게!!
         List<Counsel> counselListByState = counselRepository.findAllByStateOrderByCreatedDateTimeDesc(counselState);
         return CounselHistoryResponse.fromCounselList(counselListByState);
     }

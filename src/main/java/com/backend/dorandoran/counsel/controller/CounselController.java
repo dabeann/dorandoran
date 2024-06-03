@@ -138,10 +138,10 @@ class CounselController {
                                 + exitCode + "\n" + output.toString().trim(), null), HttpStatus.BAD_REQUEST);
             }
 
-            String summary = output.toString().trim();
+            String resultWithSummary = output.toString().trim();
 
             return new ResponseEntity<>(new CommonResponse<>("상담 결과",
-                    counselService.endCounsel(summary)), HttpStatus.OK);
+                    counselService.endCounsel(counselId, resultWithSummary)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new CommonResponse<>("Error: " + e, null),
                     HttpStatus.BAD_REQUEST);
