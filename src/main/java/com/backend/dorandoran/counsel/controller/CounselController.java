@@ -5,6 +5,7 @@ import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
+import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
 import com.backend.dorandoran.counsel.service.CounselService;
@@ -185,6 +186,27 @@ class CounselController {
     ResponseEntity<CommonResponse<ProceedCounselResponse>> getProceedCounsel(
             @PathVariable("counselId") Long counselId) {
         return new ResponseEntity<>(new CommonResponse<>("진행중 상담 클릭", counselService.getProceedCounsel(counselId)),
+                HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 종료된 상담 클릭",
+            description = """
+                    ## 요청 :
+                    - header token (필수)
+                    - Long {counselId} (필수)
+                    ## 응답 :
+                    - Long counselId
+                    - String result
+                    - String summary
+                    - messages [{String role, String message}, ...]
+                        - role: "상담원" or "내담자"
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/finish/{counselId}")
+    ResponseEntity<CommonResponse<FinishCounselResponse>> getFinishCounsel(
+            @PathVariable("counselId") Long counselId) {
+        return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭", counselService.getFinishCounsel(counselId)),
                 HttpStatus.OK);
     }
 }
