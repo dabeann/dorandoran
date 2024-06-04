@@ -37,7 +37,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 채팅",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - Long counselId (필수)
                     - String message (필수)
                     ## 응답 :
@@ -86,7 +86,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 시작",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     ## 응답 :
                     - Long counselId
                     - String message
@@ -101,7 +101,7 @@ class CounselController {
     @Operation(summary = "summary : 상담 종료",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - {counselId} (필수)
                     ## 응답 :
                     - String result
@@ -151,13 +151,13 @@ class CounselController {
     @Operation(summary = "summary : 상담 내역",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - String {state} (필수)
                         - "진행중"
                         - "종료"
                     ## 응답 :
-                    - boolean isPsychTestDone 심리 검사 여부
-                    - boolean hasCounselHistory 상담(종료,진행중 모두) 있는지 여부
+                    - Boolean isPsychTestDone 심리 검사 여부
+                    - Boolean hasCounselHistory 상담(종료,진행중 모두) 있는지 여부
                     - List counselHistories [{Long counselId,
                                String title,
                                LocalDate date}, ...]
@@ -175,7 +175,7 @@ class CounselController {
     @Operation(summary = "summary : 진행중 상담 클릭",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - Long {counselId} (필수)
                     ## 응답 :
                     - Long counselId
@@ -194,7 +194,7 @@ class CounselController {
     @Operation(summary = "summary : 종료된 상담 클릭",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - Long {counselId} (필수)
                     ## 응답 :
                     - Long counselId

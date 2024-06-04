@@ -27,7 +27,7 @@ class ContentsController {
     @Operation(summary = "summary : 콘텐츠 메인",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - String {category} (필수X)
                         - '당신을 위한 콘텐츠' 일 경우 null(빈 값)
                         - 그 외 경우 병명 넘기기 (우울증, 스트레스, 불안증, 알코올_중독, 흡연_중독)
@@ -49,7 +49,7 @@ class ContentsController {
     @Operation(summary = "summary : 명상 시청",
             description = """
                     ## 요청 :
-                    - header token (필수)
+                    - Header token (필수)
                     - String {duration} (필수)
                     ## 응답 :
                     - String 제목
