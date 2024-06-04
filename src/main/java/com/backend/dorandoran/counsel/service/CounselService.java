@@ -15,13 +15,13 @@ import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -53,9 +53,7 @@ public class CounselService {
         Optional<User> findUser = userRepository.findById(userId);
         User user = findUser.get();
 
-        List<Disease> diseasesList = Arrays.stream(user.getDiseases())
-                .map(Disease::valueOf)
-                .toList();
+        List<Disease> diseasesList = List.of(user.getDiseases());
 
         List<PsychotherapyContents> contentsByCategories = psychotherapyContentsRepository
                 .findAllByCategoryIn(diseasesList);
