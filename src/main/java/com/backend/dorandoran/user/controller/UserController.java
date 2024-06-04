@@ -1,7 +1,9 @@
 package com.backend.dorandoran.user.controller;
 
+import com.backend.dorandoran.assessment.service.PsychologicalAssessmentService;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
+import com.backend.dorandoran.user.domain.LoginResponse;
 import com.backend.dorandoran.user.domain.request.SmsSendRequest;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
 import com.backend.dorandoran.user.service.UserService;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 class UserController {
 
     private final UserService userService;
+    private final PsychologicalAssessmentService psychologicalAssessmentService;
 
     @Operation(summary = "summary : SMS 인증번호 전송",
             description = """
@@ -49,17 +52,19 @@ class UserController {
                     - String phoneNumber (숫자 11자리만 가능) (필수)
                     - String verificationCode (숫자 6자리만 가능) (필수)
                     ## 응답 :
-                    - header(Authorization Bearer 토큰)
-                    - 심리검사 진행 여부(boolean) (추가 예정)
+                    - Header(Authorization Bearer 토큰)
+                    - Boolean data 심리검사 진행 여부
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/login")
-    ResponseEntity<CommonResponse<String>> verifyCodeAndLogin(@Valid @RequestBody SmsVerificationRequest request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, userService.verifySms(request));
+    ResponseEntity<CommonResponse<Boolean>> verifyCodeAndLogin(@Valid @RequestBody SmsVerificationRequest request) {
+        LoginResponse loginResponse = userService.verifySms(request);
 
-        // TODO "Success" 대신 심리검사 여부 추가
-        return new ResponseEntity<>(new CommonResponse<>("회원가입/로그인", "Success"), headers, HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, loginResponse.accessToken());
+
+        return new ResponseEntity<>(new CommonResponse<>("회원가입/로그인",
+                loginResponse.hasPsychologicalAssessmentResult()), headers, HttpStatus.OK);
     }
 }

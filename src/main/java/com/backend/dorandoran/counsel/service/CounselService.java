@@ -20,7 +20,6 @@ import com.backend.dorandoran.counsel.repository.DialogRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -57,9 +56,7 @@ public class CounselService {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         User user = userRepository.findById(userId).get();
 
-        List<Disease> diseasesList = Arrays.stream(user.getDiseases())
-                .map(Disease::valueOf)
-                .toList();
+        List<Disease> diseasesList = List.of(user.getDiseases());
 
         List<PsychotherapyContents> contentsByCategories = psychotherapyContentsRepository
                 .findAllByCategoryIn(diseasesList);

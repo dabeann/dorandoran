@@ -1,16 +1,19 @@
 package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
+import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.UserRole;
 import com.backend.dorandoran.contents.domain.entity.Quotation;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+
+import java.util.List;
 
 @Builder
 @Getter
@@ -37,13 +40,21 @@ public class User extends BaseDateTimeEntity {
 
     @Type(StringArrayType.class)
     @Column(name = "diseases", columnDefinition = "text[]")
-    private String[] diseases = new String[0];
+    private Disease[] diseases;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quotation_id")
     private Quotation todayQuotation;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserMentalState> userMentalStates;
+
     public void updateTodayQuotation(Quotation quotation) {
+        this.todayQuotation = quotation;
+    }
+
+    public void updateDiseasesAndQuotation(Disease[] diseases, Quotation quotation) {
+        this.diseases = diseases;
         this.todayQuotation = quotation;
     }
 
