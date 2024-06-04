@@ -1,5 +1,6 @@
 package com.backend.dorandoran.counsel.service;
 
+import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.CounselResult;
@@ -19,7 +20,9 @@ import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.counsel.repository.DialogRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
+import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class CounselService {
     private final CounselRepository counselRepository;
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
     private final DialogRepository dialogRepository;
+    private final UserMentalStateRepository userMentalStateRepository;
 
     public StartCounselResponse startCounsel() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
@@ -48,7 +52,7 @@ public class CounselService {
 
         // TODO 기본 멘트 바뀌면 바꾸기
         return new StartCounselResponse(savedCounsel.getId(),
-                "안녕하세요 " + user.getName() + "님! 어떤 이야기든 저에게 말해주세요.");
+                "안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.");
     }
 
     @Transactional
@@ -63,16 +67,24 @@ public class CounselService {
         Collections.shuffle(contentsByCategories);
         List<PsychotherapyContents> limitThreeContents = contentsByCategories.stream().limit(3).toList();
 
-        String[] scorePart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
-        int totalScore = Integer.parseInt(scorePart[0].trim()) +
-                Integer.parseInt(scorePart[1].trim()) +
-                Integer.parseInt(scorePart[2].trim());
-        // TODO 사용자 심리 상태 entity에 추가하기
+        String[] scoreStringPart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
+        int[] scores = Arrays.stream(scoreStringPart).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
+
+        saveNewUserMentalState(user, scores);
+
+        int totalScore = Arrays.stream(scores).sum();
         String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
         result = user.getName() + result;
         counselRepository.findById(counselId).get().updateResult(result);
         String summary = resultWithSummary.trim().split("\\r\\n")[1];
         return new CounselResultResponse(result, summary, limitThreeContents);
+    }
+
+    private void saveNewUserMentalState(User user, int[] scores) {
+        UserMentalState previousMentalState = userMentalStateRepository.findFirstByUserOrderByCreatedDateTimeDesc(user)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
+        UserMentalState userMentalState = UserMentalState.toUserMentalStateEntity(user, previousMentalState, scores);
+        userMentalStateRepository.save(userMentalState);
     }
 
     @Transactional
