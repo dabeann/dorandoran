@@ -51,11 +51,11 @@ def generate_chat_summary(counsel_id):
             {"role": conv["role"], "content": conv["contents"]} for conv in previous_conversations
         ]
         messages = [{"role": "system", "content": "다음은 내담자와 상담자의 대화입니다. "
-                                                  "이 대화의 주요 내용을 150글자 이내로 간단히 요약해주세요.:" + str(history)}]
+                                                  "이 대화의 내용을 150글자 이내로 간단히 요약해주세요.:" + str(history)}]
 
         # GPT 모델에게 요약 요청
         response = openai.chat.completions.create(
-            model=os.getenv('MODEL_NAME'),
+            model="gpt-4o",
             messages=messages,
             max_tokens=150,
             temperature=0.7,
@@ -75,12 +75,16 @@ def generate_chat_summary(counsel_id):
         conn.commit()
 
         # 심리점수 내기
-        messages = [{"role": "system", "content": "점수내줘 어쩌고 뒤에는 대화 내역이야" + str(history)}]
+        messages = [
+            {"role": "system", "content": "대화 내역을 바탕으로 우울, 스트레스, 불안 점수를 추출합니다."},
+            {"role": "assistant", "content": "1,-2,3 형태로 추출합니다. 점수는 -3~3점 중 정수로 추출합니다. 상태가 호전된다면 양수, 악화된다면 음수로 추출합니다."},
+            {"role": "user", "content": f"{str(history)}를 기반으로 점수를 추출합니다. 우울, 스트레스, 불안 점수를 주어진 형식에 맞게 정확히 추출합니다."}
+        ]
 
         # GPT 모델에게 점수 추출 요구
         # 프롬포트 수정 필요
         response = openai.chat.completions.create(
-            model=os.getenv('MODEL_NAME'),
+            model="gpt-4o",
             messages=messages,
             max_tokens=150,
             temperature=0.7,
@@ -88,8 +92,6 @@ def generate_chat_summary(counsel_id):
             stop=None
         ).choices[0].message.content
         print(response)
-        print("----")
-        #1,2,3이 기본 형식이고 만약 숫자랑 , 말고 다른거 나오면 처리해야됨
 
         return summary
 

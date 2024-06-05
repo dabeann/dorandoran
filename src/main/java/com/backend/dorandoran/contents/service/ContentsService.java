@@ -15,13 +15,12 @@ import com.backend.dorandoran.contents.repository.QuotationRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -44,8 +43,7 @@ public class ContentsService {
 
     public ContentsResponse getMainContents(String category) {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
-        Optional<User> findUser = userRepository.findById(userId);
-        User user = findUser.get();
+        User user = userRepository.findById(userId).get();
 
         String quotation = null;
         if (user.getDiseases() != null) {

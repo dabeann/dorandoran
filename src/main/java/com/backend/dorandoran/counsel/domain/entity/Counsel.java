@@ -57,4 +57,8 @@ public class Counsel extends BaseDateTimeEntity {
     public void updateState(CounselState state) {
         this.state = state;
     }
+
+    public void updateResult(String result) {
+        this.result = result;
+    }
 }
