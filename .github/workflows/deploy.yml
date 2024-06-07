@@ -1,0 +1,55 @@
+name: Dorandoran Auto Deploy
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+      # checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # JDK setting
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      # secret yml file 생성
+      - name: Set secret yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.COOL_SMS_YML }}" | base64 --decode > src/main/resources/application-cool-sms.yml
+          echo "${{ secrets.REDIS_YML }}" | base64 --decode > src/main/resources/application-redis.yml
+          echo "${{ secrets.DATABASE_YML }}" | base64 --decode > src/main/resources/application-database.yml
+          echo "${{ secrets.JWT_YML }}" | base64 --decode > src/main/resources/application-jwt.yml
+          find src
+        shell: bash
+
+      # Gradle 권한 부여
+      - name: Grant permission for gradlew
+        run: chmod +x ./gradlew
+
+      # 테스트 없이 빌드
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      # 포트가 사용 중이라면 종료
+      - name: Kill 8008 port if exist
+        run: |
+          if sudo lsof -i :8008; then
+            echo "Port 8008 is already in use. Killing the process..."
+            sudo kill -9 `sudo lsof -t -i:8008`
+          fi
+      # Jar 파일 실행
+      - name: Execute Jar File
+        run: |
+          sudo nohup java -jar build/libs/dorandoran-0.0.1-SNAPSHOT.jar 1>/home/ubuntu/nohup/output.log 2>/home/ubuntu/nohup/error.log &
+          sleep 30
