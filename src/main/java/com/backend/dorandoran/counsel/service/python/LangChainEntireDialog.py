@@ -127,6 +127,8 @@ def get_chat_response(counsel_id, user_message):
                 else:
                     continue
 
+        # TODO 위급 상황일 경우 담당 기관에 연락 가도록 하기
+
         return gpt_message
 
     except Exception as e:
