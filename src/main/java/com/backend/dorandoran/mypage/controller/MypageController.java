@@ -1,5 +1,6 @@
 package com.backend.dorandoran.mypage.controller;
 
+import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.response.CommonResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
@@ -38,6 +39,51 @@ class MypageController {
     @GetMapping("/main")
     ResponseEntity<CommonResponse<MypageMainResponse>> getUserInfoForMypageMain() {
         return new ResponseEntity<>(new CommonResponse<>("마이페이지 메인", mypageService.getUserInfoForMypageMain()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 나의 첫 심리검사 결과 조회",
+            description = """
+                    ## 요청 :
+                    - Header(Authorization Bearer *토큰* (필수))
+                    ## 응답 :
+                    - String name 검사자 이름
+                    - String testDate 검사일
+                    - List<Object> result 결과 목록
+                        - String category 카테고리
+                        - Integer score 점수
+                        - Integer percent 퍼센트(%)
+                    - 예시
+                        {
+                            "message": "심리검사 결과 분석",
+                            "data": {
+                                "name": "박다정",
+                                "testDate": "2024년 06월 03일",
+                                "result": [
+                                    {
+                                        "category": "DEPRESSION",
+                                        "score": 67,
+                                        "percent": 33
+                                    },
+                                    {
+                                        "category": "STRESS",
+                                        "score": 60,
+                                        "percent": 40
+                                    },
+                                    {
+                                        "category": "ANXIETY",
+                                        "score": 73,
+                                        "percent": 27
+                                    }
+                                ]
+                            }
+                        }
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/first-assessment-result")
+    ResponseEntity<CommonResponse<PsychologicalAssessmentResponse>> getUserFirstAssessmentResult() {
+        return new ResponseEntity<>(new CommonResponse<>("첫 심리검사 결과 조회",
+                mypageService.getUserFirstAssessmentResult()), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 로그아웃",
