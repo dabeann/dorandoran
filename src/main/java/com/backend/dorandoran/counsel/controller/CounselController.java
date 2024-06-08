@@ -3,30 +3,21 @@ package com.backend.dorandoran.counsel.controller;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
-import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
-import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
-import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
-import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
-import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
+import com.backend.dorandoran.counsel.domain.response.*;
 import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Counsel", description = "상담 관련 API입니다.")
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+@Tag(name = "상담", description = "상담 관련 API입니다.")
 @RequestMapping("/api/counsel")
 @RequiredArgsConstructor
 @RestController
