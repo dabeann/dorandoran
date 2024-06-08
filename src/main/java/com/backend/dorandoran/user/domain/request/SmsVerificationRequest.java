@@ -1,5 +1,6 @@
 package com.backend.dorandoran.user.domain.request;
 
+import com.backend.dorandoran.common.domain.user.UserAgency;
 import jakarta.validation.constraints.Pattern;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +13,8 @@ public record SmsVerificationRequest(
         String phoneNumber,
         @NotNull
         @Pattern(regexp = "^[0-9]{6}$", message = "인증번호 6자리를 입력해주세요.")
-        String verificationCode
+        String verificationCode,
+        @NotNull
+        UserAgency userAgency
 ) {
 }
