@@ -42,6 +42,7 @@ class PsychologicalAssessmentController {
     @Operation(summary = "summary : 심리검사 결과 분석",
             description = """
                     ## 요청 :
+                    - Header (Authorization Bearer 토큰) (필수)
                     - Object category (BASIC, STRESS, DEPRESSION, ANXIETY) 문항 카테고리
                     - List<Object> questionAnswers 문항 답변 리스트
                         - Integer questionId 문항 번호
