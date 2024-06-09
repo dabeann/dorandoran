@@ -37,4 +37,14 @@ public class SmsUtil {
 
         messageService.sendOne(new SingleMessageSendingRequest(message));
     }
+
+    public void sendEmergencySms(String phoneNumber, String content) {
+        Message message = new Message();
+        message.setFrom(FROM_PHONE_NUMBER);
+        message.setTo(phoneNumber);
+        // TODO 내용 수정 필요
+        message.setText(content + "위급위급");
+
+        messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
 }
