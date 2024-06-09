@@ -51,6 +51,7 @@ class UserController {
                     - String name (한글만 가능) (필수)
                     - String phoneNumber (숫자 11자리만 가능) (필수)
                     - String verificationCode (숫자 6자리만 가능) (필수)
+                    - String userAgency 소속기관 (필수)
                     ## 응답 :
                     - Header(Authorization Bearer 토큰)
                     - Boolean data 심리검사 진행 여부

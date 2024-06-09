@@ -2,7 +2,8 @@ package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
 import com.backend.dorandoran.common.domain.Disease;
-import com.backend.dorandoran.common.domain.UserRole;
+import com.backend.dorandoran.common.domain.user.UserAgency;
+import com.backend.dorandoran.common.domain.user.UserRole;
 import com.backend.dorandoran.contents.domain.entity.Quotation;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -49,6 +50,10 @@ public class User extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserMentalState> userMentalStates;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "agency", nullable = false)
+    private UserAgency userAgency;
+
     public void updateTodayQuotation(Quotation quotation) {
         this.todayQuotation = quotation;
     }
@@ -63,6 +68,7 @@ public class User extends BaseDateTimeEntity {
                 .name(request.name())
                 .phoneNumber(request.phoneNumber())
                 .role(UserRole.ROLE_USER)
+                .userAgency(request.userAgency())
                 .build();
     }
 }
