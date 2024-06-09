@@ -98,7 +98,7 @@ def get_chat_response(counsel_id, user_message):
         if not previous_conversations:
             while True:
                 counsel_name = openai.chat.completions.create(
-                    model=os.getenv('MODEL_NAME'),
+                    model="gpt-4o",
                     messages=[
                         {
                             "role": "system",
