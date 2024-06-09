@@ -76,7 +76,7 @@ class CounselController {
             }
 
             String result = output.toString().trim();
-            String resultMessage = counselService.sendEmergencySms(result);
+            String resultMessage = counselService.sendEmergencySms(result, request.counselId());
 
             return new ResponseEntity<>(new CommonResponse<>("상담 채팅", resultMessage), HttpStatus.OK);
         } catch (Exception e) {

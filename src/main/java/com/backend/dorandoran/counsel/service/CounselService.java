@@ -22,6 +22,7 @@ import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
+import com.backend.dorandoran.user.service.SmsUtil;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,12 +39,19 @@ public class CounselService {
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
+    private final SmsUtil smsUtil;
 
-    public String sendEmergencySms(String messageWithFlag) {
+    public String sendEmergencySms(String messageWithFlag, Long counselId) {
         String flag = messageWithFlag.trim().split("\\r\\n")[0];
 
         // TODO flag가 1이면 sms 전송
         System.out.println("flag = " + flag);
+        if (flag.equals("1")) {
+            Counsel counsel = counselRepository.findById(counselId).get();
+            User user = counsel.getUser();
+            // TODO 내용 정해지면 수정
+            //smsUtil.sendEmergencySms("보낼 전화번호", "내용내용");
+        }
 
         return messageWithFlag.trim().split("\\r\\n")[1];
     }
