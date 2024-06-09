@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +76,9 @@ class CounselController {
             }
 
             String result = output.toString().trim();
-            return new ResponseEntity<>(new CommonResponse<>("상담 채팅", result), HttpStatus.OK);
+            String resultMessage = counselService.sendEmergencySms(result);
+
+            return new ResponseEntity<>(new CommonResponse<>("상담 채팅", resultMessage), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new CommonResponse<>("Error: ", e.toString()), HttpStatus.BAD_REQUEST);
         }

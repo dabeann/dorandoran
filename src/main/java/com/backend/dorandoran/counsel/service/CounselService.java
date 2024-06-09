@@ -39,6 +39,15 @@ public class CounselService {
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
 
+    public String sendEmergencySms(String messageWithFlag) {
+        String flag = messageWithFlag.trim().split("\\r\\n")[0];
+
+        // TODO flag가 1이면 sms 전송
+        System.out.println("flag = " + flag);
+
+        return messageWithFlag.trim().split("\\r\\n")[1];
+    }
+
     public StartCounselResponse startCounsel() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         User user = userRepository.findById(userId).get();
@@ -50,7 +59,6 @@ public class CounselService {
                 .build();
         Counsel savedCounsel = counselRepository.save(counsel);
 
-        // TODO 기본 멘트 바뀌면 바꾸기
         return new StartCounselResponse(savedCounsel.getId(),
                 "안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.");
     }

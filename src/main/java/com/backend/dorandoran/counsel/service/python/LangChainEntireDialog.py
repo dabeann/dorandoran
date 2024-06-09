@@ -127,7 +127,18 @@ def get_chat_response(counsel_id, user_message):
                 else:
                     continue
 
-        # TODO 위급 상황일 경우 담당 기관에 연락 가도록 하기
+        # TODO 위급 상황일 경우 판단 prompt 변경 필요
+        agency_message = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system",
+                 "content": f"다음 사용자 메시지가 위급상황인지 판단해서 위급하면 1, 그렇지 않다면 0을 반환해줘.: {user_message}"},
+
+            ],
+            max_tokens=100,
+            temperature=0.7
+        ).choices[0].message.content
+        print(agency_message)
 
         return gpt_message
 
