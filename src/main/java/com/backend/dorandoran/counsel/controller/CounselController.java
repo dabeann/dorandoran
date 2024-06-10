@@ -8,6 +8,7 @@ import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
+import com.backend.dorandoran.counsel.domain.response.SuggestHospitalResponse;
 import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,6 +33,23 @@ import org.springframework.web.bind.annotation.RestController;
 class CounselController {
 
     private final CounselService counselService;
+
+    @Operation(summary = "summary : 전문 상담 제안",
+            description = """
+                    ## 요청 :
+                    - Header token (필수)
+                    ## 응답 :
+                    - Boolean suggestVisit (true: 심리 상태 불안정, false: 심리 상태 안정)
+                    - String comment (suggestVisit이 false인 경우 "" 리턴)
+                    - List<String> phoneNumbers (suggestVisit이 false인 경우 빈 리스트 리턴)
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/suggest")
+    ResponseEntity<CommonResponse<SuggestHospitalResponse>> suggestHospitalVisit() {
+        return new ResponseEntity<>(new CommonResponse<>("전문 상담 제안", counselService.suggestHospitalVisit()),
+                HttpStatus.OK);
+    }
 
     @Operation(summary = "summary : 상담 채팅",
             description = """

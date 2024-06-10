@@ -72,7 +72,8 @@ public class CounselService {
 
         boolean suggestVisit = isSuggestVisit(userMentalState);
         String comment =
-                suggestVisit ? SuggestComment.UNSTABLE.getKoreanComment() : SuggestComment.STABLE.getKoreanComment();
+                suggestVisit ? user.getName() + SuggestComment.UNSTABLE.getKoreanComment()
+                        : SuggestComment.STABLE.getKoreanComment();
         List<String> phoneNumbers = getPhoneNumbers(suggestVisit);
 
         return new SuggestHospitalResponse(suggestVisit, comment, phoneNumbers);
