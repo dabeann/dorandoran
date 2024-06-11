@@ -1,5 +1,8 @@
 package com.backend.dorandoran.common.domain.user;
 
+import lombok.Getter;
+
+@Getter
 public enum UserAgency {
 
     VISION_TRAINING_CENTER("서울특별시립비전트레이닝센터"),
@@ -31,9 +34,5 @@ public enum UserAgency {
 
     UserAgency(String koreanName) {
         this.koreanName = koreanName;
-    }
-
-    public String getKoreanName() {
-        return koreanName;
     }
 }
