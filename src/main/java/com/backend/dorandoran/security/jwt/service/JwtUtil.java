@@ -4,7 +4,7 @@ import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.security.service.CustomUserDetailService;
 import com.backend.dorandoran.user.domain.entity.UserToken;
-import com.backend.dorandoran.user.service.UserTokenService;
+import com.backend.dorandoran.user.repository.UserTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -39,12 +39,12 @@ public class JwtUtil {
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private final SecretKey secretKey;
-    private final UserTokenService userTokenService;
+    private final UserTokenRepository userTokenRepository;
     private final CustomUserDetailService customUserDetailService;
 
-    public JwtUtil(@Value("${jwt.secret-key}") String key, UserTokenService userTokenService, CustomUserDetailService customUserDetailService) {
+    public JwtUtil(@Value("${jwt.secret-key}") String key, UserTokenRepository userTokenRepository, CustomUserDetailService customUserDetailService) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
-        this.userTokenService = userTokenService;
+        this.userTokenRepository = userTokenRepository;
         this.customUserDetailService = customUserDetailService;
     }
 
@@ -100,7 +100,7 @@ public class JwtUtil {
     }
 
     public String reissuedAccessToken(Long userId) {
-        UserToken userToken = userTokenService.findByUserId(userId);
+        UserToken userToken = userTokenRepository.findByUserId(userId);
         String refreshToken = userToken.getRefreshToken();
 
         if (!validateToken(refreshToken)) {
