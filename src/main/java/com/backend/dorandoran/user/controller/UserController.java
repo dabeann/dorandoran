@@ -1,11 +1,10 @@
 package com.backend.dorandoran.user.controller;
 
-import com.backend.dorandoran.assessment.service.PsychologicalAssessmentService;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
-import com.backend.dorandoran.user.domain.LoginResponse;
 import com.backend.dorandoran.user.domain.request.SmsSendRequest;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
+import com.backend.dorandoran.user.domain.request.UserJoinRequest;
 import com.backend.dorandoran.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 class UserController {
 
     private final UserService userService;
-    private final PsychologicalAssessmentService psychologicalAssessmentService;
 
     @Operation(summary = "summary : SMS 인증번호 전송",
             description = """
@@ -35,7 +33,7 @@ class UserController {
                     - String name (한글만 가능) (필수)
                     - String phoneNumber (숫자 11자리만 가능) (필수)
                     ## 응답 :
-                    - 200, "Success"
+                    - String data "Success"
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
@@ -45,27 +43,40 @@ class UserController {
         return new ResponseEntity<>(new CommonResponse<>("SMS 인증번호 전송", "Success"), HttpStatus.OK);
     }
 
-    @Operation(summary = "summary : 회원가입/로그인",
+    @Operation(summary = "summary : 인증번호 확인/로그인",
+            description = """
+                    ## 요청 :
+                    - String phoneNumber 핸드폰번호 (숫자 11자리만 가능) (필수)
+                    - String verify verificationCode 인증번호 (숫자 6자리만 가능) (필수)
+                    ## 응답 :
+                    - Header (Authorization Bearer 토큰)
+                    - String data "Success"
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @PostMapping("/verify-code")
+    ResponseEntity<CommonResponse<String>> verifyCode(@Valid @RequestBody SmsVerificationRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, userService.verifySms(request));
+        return new ResponseEntity<>(new CommonResponse<>("SMS 인증번호 확인/로그인", "Success"), headers, HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 회원가입",
             description = """
                     ## 요청 :
                     - String name (한글만 가능) (필수)
                     - String phoneNumber (숫자 11자리만 가능) (필수)
-                    - String verificationCode (숫자 6자리만 가능) (필수)
                     - String userAgency 소속기관 (필수)
                     ## 응답 :
                     - Header(Authorization Bearer 토큰)
-                    - Boolean data 심리검사 진행 여부
+                    - String data "Success"
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @PostMapping("/login")
-    ResponseEntity<CommonResponse<Boolean>> verifyCodeAndLogin(@Valid @RequestBody SmsVerificationRequest request) {
-        LoginResponse loginResponse = userService.verifySms(request);
-
+    @PostMapping("/join")
+    ResponseEntity<CommonResponse<String>> join(@Valid @RequestBody UserJoinRequest request) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, loginResponse.accessToken());
-
-        return new ResponseEntity<>(new CommonResponse<>("회원가입/로그인",
-                loginResponse.hasPsychologicalAssessmentResult()), headers, HttpStatus.OK);
+        headers.add(HttpHeaders.AUTHORIZATION, userService.join(request));
+        return new ResponseEntity<>(new CommonResponse<>("회원가입/로그인", "Success"), headers, HttpStatus.OK);
     }
 }
