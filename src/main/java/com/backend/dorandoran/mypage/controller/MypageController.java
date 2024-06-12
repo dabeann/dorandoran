@@ -31,8 +31,8 @@ class MypageController {
                     ## 요청 :
                     - Header(Authorization Bearer *토큰* (필수))
                     ## 응답 :
-                    - Long userId 사용자 고유번호
-                    - String name 사용자 이름
+                    - String name 사용자 이름,
+                    - Boolean hasPsychologicalAssessment 심리검사 여부
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
