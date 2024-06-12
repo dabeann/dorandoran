@@ -5,7 +5,7 @@ import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.user.UserAgency;
 import com.backend.dorandoran.common.domain.user.UserRole;
 import com.backend.dorandoran.contents.domain.entity.Quotation;
-import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
+import com.backend.dorandoran.user.domain.request.UserJoinRequest;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -63,7 +63,7 @@ public class User extends BaseDateTimeEntity {
         this.todayQuotation = quotation;
     }
 
-    public static User toUserEntity(SmsVerificationRequest request) {
+    public static User toUserEntity(UserJoinRequest request) {
         return User.builder()
                 .name(request.name())
                 .phoneNumber(request.phoneNumber())

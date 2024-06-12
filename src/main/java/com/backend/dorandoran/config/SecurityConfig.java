@@ -50,12 +50,12 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*") // 아래 옵션 허용하면 특정 주소로 수정
-                // Postman Header에서 Origin에 특정 주소 입력해보면 허용되었는지 알 수 있음
+                .allowedOrigins("https://dorandoran.store", "http://dorandoran.store",
+                        "http://localhost:8008", "http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
-//                .allowCredentials(true) TODO 테스트 이후 자격 증명 옵션 허용하기
+                .allowCredentials(true)
                 .maxAge(3600);
     }
 }

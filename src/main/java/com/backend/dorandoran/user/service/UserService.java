@@ -1,18 +1,17 @@
 package com.backend.dorandoran.user.service;
 
-import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.security.jwt.service.JwtUtil;
 import com.backend.dorandoran.security.service.UserInfoUtil;
-import com.backend.dorandoran.user.domain.LoginResponse;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserToken;
 import com.backend.dorandoran.user.domain.request.SmsSendRequest;
 import com.backend.dorandoran.user.domain.request.SmsVerificationRequest;
+import com.backend.dorandoran.user.domain.request.UserJoinRequest;
 import com.backend.dorandoran.user.repository.SmsVerificationRepository;
 import com.backend.dorandoran.user.repository.UserRepository;
-import com.backend.dorandoran.user.repository.querydsl.UserQueryRepository;
+import com.backend.dorandoran.user.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -29,9 +28,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final SmsUtil smsUtil;
     private final SmsVerificationRepository smsVerificationRepository;
-    private final UserTokenService userTokenService;
-    private final UserQueryRepository userQueryRepository;
-    private final UserMentalStateRepository userMentalStateRepository;
+    private final UserTokenRepository userTokenRepository;
 
     @Transactional(readOnly = true)
     public void sendSms(SmsSendRequest request) {
@@ -50,14 +47,14 @@ public class UserService {
         }
     }
 
-    public LoginResponse verifySms(SmsVerificationRequest request) {
+    @Transactional
+    public String verifySms(SmsVerificationRequest request) {
         String redisVerificationCode = smsVerificationRepository.getSmsVerificationCode(request.phoneNumber());
         throwAuthExceptions(request, redisVerificationCode);
         smsVerificationRepository.removeSmsVerificationCode(request.phoneNumber());
 
-        String accessToken = joinOrLogin(request);
-        Long userId = Long.parseLong(jwtUtil.getAuthenticationByAccessToken(accessToken).getName());
-        return new LoginResponse(accessToken, userMentalStateRepository.existsByUserId(userId));
+        Optional<User> userOptional = userRepository.findByPhoneNumber(request.phoneNumber());
+        return userOptional.map(this::updateUserToken).orElse(null);
     }
 
     private void throwAuthExceptions(SmsVerificationRequest request, String redisVerificationCode) {
@@ -68,22 +65,17 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public String joinOrLogin(SmsVerificationRequest request) {
-        Optional<UserToken> userOptional = userQueryRepository.findUserTokenByPhoneNumber(request.phoneNumber());
-        return userOptional.isPresent() ? updateUserToken(userOptional.get()) : saveUserToken(request);
-    }
-
-    private String updateUserToken(UserToken userToken) {
-        Authentication authentication = jwtUtil.getAuthenticationByUserId(userToken.getUserId());
-
+    private String updateUserToken(User user) {
+        Authentication authentication = jwtUtil.getAuthenticationByUserId(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(authentication);
+
+        UserToken userToken = userTokenRepository.findByUserId(user.getId());
         userToken.updateRefreshToken(refreshToken);
-        userTokenService.save(userToken); // TODO 더티체킹으로 처리하는 방법 찾기(쿼리 줄이기)
         return jwtUtil.createAccessToken(authentication);
     }
 
-    private String saveUserToken(SmsVerificationRequest request) {
+    @Transactional
+    public String join(UserJoinRequest request) {
         User user = User.toUserEntity(request);
         userRepository.save(user);
 
@@ -91,20 +83,20 @@ public class UserService {
 
         String refreshToken = jwtUtil.createRefreshToken(authentication);
         UserToken userToken = UserToken.toUserTokenEntity(user.getId(), refreshToken);
-        userTokenService.save(userToken);
+        userTokenRepository.save(userToken);
         return jwtUtil.createAccessToken(authentication);
     }
 
     @Transactional
     public void logout() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
-        userTokenService.deleteByUserId(userId);
+        userTokenRepository.deleteByUserId(userId);
     }
 
     @Transactional
     public void signOut() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
-        userTokenService.deleteByUserId(userId);
+        userTokenRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
         // TODO 사용자 관련 심리검사, 상담 등 삭제
     }
