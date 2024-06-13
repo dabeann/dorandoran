@@ -10,7 +10,7 @@ class ContentsSwaggerConfig {
     @Bean
     GroupedOpenApi contentsDocs() {
         return GroupedOpenApi.builder()
-                .group("Contents API")
+                .group("콘텐츠 API")
                 .packagesToScan("com.backend.dorandoran.contents.controller")
                 .build();
     }
