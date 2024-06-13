@@ -8,6 +8,7 @@ import com.backend.dorandoran.common.domain.counsel.CounselState;
 import com.backend.dorandoran.common.domain.counsel.CounselorType;
 import com.backend.dorandoran.common.domain.counsel.SuggestCallCenter;
 import com.backend.dorandoran.common.domain.counsel.SuggestComment;
+import com.backend.dorandoran.common.domain.user.UserAgency;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -50,13 +50,10 @@ public class CounselService {
     public String sendEmergencySms(String messageWithFlag, Long counselId) {
         String flag = messageWithFlag.trim().split("\\r\\n")[0];
 
-        // TODO flag가 1이면 sms 전송
-        System.out.println("flag = " + flag);
         if (flag.equals("1")) {
             Counsel counsel = counselRepository.findById(counselId).get();
             User user = counsel.getUser();
-            // TODO 내용 정해지면 수정
-            //smsUtil.sendEmergencySms("보낼 전화번호", "내용내용");
+            smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
         }
 
         return messageWithFlag.trim().split("\\r\\n")[1];
