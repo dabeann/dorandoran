@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface UserQueryRepository {
 
     Optional<UserToken> findUserTokenByPhoneNumber(String phoneNumber);
+
+    void deleteCounselAndDialogByUserId(Long userId);
 }
