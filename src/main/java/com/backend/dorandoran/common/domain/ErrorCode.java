@@ -36,6 +36,7 @@ public enum ErrorCode {
     NOT_FOUND_USERNAME(BAD_REQUEST, "이름과 휴대폰번호가 일치하지 않아요."),
     NOT_FOUND_DISEASE(BAD_REQUEST, "존재하지 않는 병명입니다."),
     NOT_FOUND_MENTAL_STATE(BAD_REQUEST, "심리 상태가 존재하지 않습니다."),
+    ALREADY_EXISTING_USER(BAD_REQUEST, "이미 존재하는 회원입니다."),
 
     // counsel
     NOT_FOUND_COUNSEL(BAD_REQUEST, "존재하지 않는 상담입니다."),
