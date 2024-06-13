@@ -36,24 +36,12 @@ public class UserMentalState extends BaseDateTimeEntity {
     @Column(name = "anxiety", nullable = false)
     private Integer anxiety;
 
-    @Column(name = "depression_percent", nullable = false)
-    private Integer depressionPercent;
-
-    @Column(name = "stress_percent", nullable = false)
-    private Integer stressPercent;
-
-    @Column(name = "anxiety_percent", nullable = false)
-    private Integer anxietyPercent;
-
     public static UserMentalState toUserMentalStateEntity(User user, List<PsychologicalAssessmentResponse.PsychologicalAssessmentResult> results) {
         return UserMentalState.builder()
                 .user(user)
                 .depression(results.get(0).getScore())
                 .stress(results.get(1).getScore())
                 .anxiety(results.get(2).getScore())
-                .depressionPercent(results.get(0).getPercent())
-                .stressPercent(results.get(1).getPercent())
-                .anxietyPercent(results.get(2).getPercent())
                 .build();
     }
 
@@ -63,9 +51,6 @@ public class UserMentalState extends BaseDateTimeEntity {
                 .depression(previousMentalState.getDepression() + scores[0])
                 .stress(previousMentalState.getStress() + scores[1])
                 .anxiety(previousMentalState.getAnxiety() + scores[2])
-                .depressionPercent(previousMentalState.getDepressionPercent() - scores[0])
-                .stressPercent(previousMentalState.getStressPercent() - scores[1])
-                .anxietyPercent(previousMentalState.getAnxietyPercent() - scores[2])
                 .build();
     }
 }
