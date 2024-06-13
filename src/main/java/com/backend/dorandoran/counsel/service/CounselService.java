@@ -6,6 +6,9 @@ import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.CounselResult;
 import com.backend.dorandoran.common.domain.counsel.CounselState;
 import com.backend.dorandoran.common.domain.counsel.CounselorType;
+import com.backend.dorandoran.common.domain.counsel.SuggestCallCenter;
+import com.backend.dorandoran.common.domain.counsel.SuggestComment;
+import com.backend.dorandoran.common.domain.user.UserAgency;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
@@ -16,16 +19,20 @@ import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
 import com.backend.dorandoran.counsel.domain.response.FinishCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.ProceedCounselResponse;
 import com.backend.dorandoran.counsel.domain.response.StartCounselResponse;
+import com.backend.dorandoran.counsel.domain.response.SuggestHospitalResponse;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.counsel.repository.DialogRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
+import com.backend.dorandoran.user.service.SmsUtil;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +45,51 @@ public class CounselService {
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
+    private final SmsUtil smsUtil;
+
+    public String sendEmergencySms(String messageWithFlag, Long counselId) {
+        String flag = messageWithFlag.trim().split("\\r\\n")[0];
+
+        if (flag.equals("1")) {
+            Counsel counsel = counselRepository.findById(counselId).get();
+            User user = counsel.getUser();
+            smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
+        }
+
+        return messageWithFlag.trim().split("\\r\\n")[1];
+    }
+
+    public SuggestHospitalResponse suggestHospitalVisit() {
+        final Long userId = UserInfoUtil.getUserIdOrThrow();
+        User user = userRepository.findById(userId).get();
+
+        UserMentalState userMentalState = userMentalStateRepository
+                .findFirstByUserOrderByCreatedDateTimeDesc(user)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
+
+        boolean suggestVisit = isSuggestVisit(userMentalState);
+        String comment =
+                suggestVisit ? user.getName() + SuggestComment.UNSTABLE.getKoreanComment()
+                        : SuggestComment.STABLE.getKoreanComment();
+        List<String> phoneNumbers = getPhoneNumbers(suggestVisit);
+
+        return new SuggestHospitalResponse(suggestVisit, comment, phoneNumbers);
+    }
+
+    @NotNull
+    private static List<String> getPhoneNumbers(boolean suggestVisit) {
+        List<String> phoneNumbers = new ArrayList<>();
+        if (suggestVisit) {
+            for (SuggestCallCenter callCenter : SuggestCallCenter.values()) {
+                phoneNumbers.add(callCenter.getPhoneNumber());
+            }
+        }
+        return phoneNumbers;
+    }
+
+    private static boolean isSuggestVisit(UserMentalState mentalState) {
+        return mentalState.getDepression() <= 40 || mentalState.getStress() <= 40 || mentalState.getAnxiety() <= 40;
+    }
 
     public StartCounselResponse startCounsel() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
@@ -50,7 +102,6 @@ public class CounselService {
                 .build();
         Counsel savedCounsel = counselRepository.save(counsel);
 
-        // TODO 기본 멘트 바뀌면 바꾸기
         return new StartCounselResponse(savedCounsel.getId(),
                 "안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.");
     }

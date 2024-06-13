@@ -98,7 +98,7 @@ def get_chat_response(counsel_id, user_message):
         if not previous_conversations:
             while True:
                 counsel_name = openai.chat.completions.create(
-                    model=os.getenv('MODEL_NAME'),
+                    model="gpt-4o",
                     messages=[
                         {
                             "role": "system",
@@ -126,6 +126,19 @@ def get_chat_response(counsel_id, user_message):
                     break
                 else:
                     continue
+
+        # TODO 위급 상황일 경우 판단 prompt 변경 필요
+        agency_message = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system",
+                 "content": f"다음 사용자 메시지가 위급상황인지 판단해서 위급하면 1, 그렇지 않다면 0을 반환해줘.: {user_message}"},
+
+            ],
+            max_tokens=100,
+            temperature=0.7
+        ).choices[0].message.content
+        print(agency_message)
 
         return gpt_message
 

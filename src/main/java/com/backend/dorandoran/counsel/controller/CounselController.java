@@ -8,14 +8,13 @@ import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 @Tag(name = "상담", description = "상담 관련 API입니다.")
 @RequestMapping("/api/counsel")
@@ -24,6 +23,23 @@ import java.nio.charset.StandardCharsets;
 class CounselController {
 
     private final CounselService counselService;
+
+    @Operation(summary = "summary : 전문 상담 제안",
+            description = """
+                    ## 요청 :
+                    - Header token (필수)
+                    ## 응답 :
+                    - Boolean suggestVisit (true: 심리 상태 불안정, false: 심리 상태 안정)
+                    - String comment (suggestVisit이 false인 경우 "" 리턴)
+                    - List<String> phoneNumbers (suggestVisit이 false인 경우 빈 리스트 리턴)
+                    """)
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/suggest")
+    ResponseEntity<CommonResponse<SuggestHospitalResponse>> suggestHospitalVisit() {
+        return new ResponseEntity<>(new CommonResponse<>("전문 상담 제안", counselService.suggestHospitalVisit()),
+                HttpStatus.OK);
+    }
 
     @Operation(summary = "summary : 상담 채팅",
             description = """
@@ -68,7 +84,9 @@ class CounselController {
             }
 
             String result = output.toString().trim();
-            return new ResponseEntity<>(new CommonResponse<>("상담 채팅", result), HttpStatus.OK);
+            String resultMessage = counselService.sendEmergencySms(result, request.counselId());
+
+            return new ResponseEntity<>(new CommonResponse<>("상담 채팅", resultMessage), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new CommonResponse<>("Error: ", e.toString()), HttpStatus.BAD_REQUEST);
         }
