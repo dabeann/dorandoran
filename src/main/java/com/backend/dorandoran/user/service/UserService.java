@@ -76,6 +76,10 @@ public class UserService {
 
     @Transactional
     public String join(UserJoinRequest request) {
+        if (userRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
+            throw new CommonException(ErrorCode.ALREADY_EXISTING_USER);
+        }
+
         User user = User.toUserEntity(request);
         userRepository.save(user);
 

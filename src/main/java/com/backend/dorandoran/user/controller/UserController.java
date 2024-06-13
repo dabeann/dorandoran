@@ -47,7 +47,7 @@ class UserController {
             description = """
                     ## 요청 :
                     - String phoneNumber 핸드폰번호 (숫자 11자리만 가능) (필수)
-                    - String verify verificationCode 인증번호 (숫자 6자리만 가능) (필수)
+                    - String verificationCode 인증번호 (숫자 6자리만 가능) (필수)
                     ## 응답 :
                     - Header (Authorization Bearer 토큰)
                     - String data "Success"
