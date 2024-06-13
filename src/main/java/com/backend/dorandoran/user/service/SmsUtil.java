@@ -38,12 +38,11 @@ public class SmsUtil {
         messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendEmergencySms(String phoneNumber, String content) {
+    public void sendEmergencySms(String phoneNumber, String name, String userPhoneNumber) {
         Message message = new Message();
         message.setFrom(FROM_PHONE_NUMBER);
         message.setTo(phoneNumber);
-        // TODO 내용 수정 필요
-        message.setText(content + "위급위급");
+        message.setText(name + "님이 현재 심리적으로 위급한 상황입니다. " + name + "님의 전화번호 : " + userPhoneNumber);
 
         messageService.sendOne(new SingleMessageSendingRequest(message));
     }
