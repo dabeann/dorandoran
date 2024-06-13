@@ -1,5 +1,6 @@
 package com.backend.dorandoran.user.service;
 
+import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.security.jwt.service.JwtUtil;
@@ -12,6 +13,7 @@ import com.backend.dorandoran.user.domain.request.UserJoinRequest;
 import com.backend.dorandoran.user.repository.SmsVerificationRepository;
 import com.backend.dorandoran.user.repository.UserRepository;
 import com.backend.dorandoran.user.repository.UserTokenRepository;
+import com.backend.dorandoran.user.repository.querydsl.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class UserService {
     private final SmsUtil smsUtil;
     private final SmsVerificationRepository smsVerificationRepository;
     private final UserTokenRepository userTokenRepository;
+    private final UserMentalStateRepository userMentalStateRepository;
+    private final UserQueryRepository userQueryRepository;
 
     @Transactional(readOnly = true)
     public void sendSms(SmsSendRequest request) {
@@ -101,7 +105,8 @@ public class UserService {
     public void signOut() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         userTokenRepository.deleteByUserId(userId);
+        userMentalStateRepository.deleteByUserId(userId);
+        userQueryRepository.deleteCounselAndDialogByUserId(userId);
         userRepository.deleteById(userId);
-        // TODO 사용자 관련 심리검사, 상담 등 삭제
     }
 }
