@@ -1,10 +1,11 @@
 package com.backend.dorandoran.common.domain.counsel;
 
-import com.backend.dorandoran.common.domain.Disease;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
 
+@Getter
 public enum CounselState {
     PROCEED_STATE("진행중"),
     FINISH_STATE("종료");
@@ -13,10 +14,6 @@ public enum CounselState {
 
     CounselState(String koreanState) {
         this.koreanState = koreanState;
-    }
-
-    public String getKoreanState() {
-        return koreanState;
     }
 
     private static final Map<String, CounselState> BY_KOREAN_STATE =

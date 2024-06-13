@@ -3,7 +3,9 @@ package com.backend.dorandoran.common.domain;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
 
+@Getter
 public enum MeditationDuration {
     THREE_MINUTES(3),
     FIVE_MINUTES(5),
@@ -15,10 +17,6 @@ public enum MeditationDuration {
 
     MeditationDuration(int minutes) {
         this.minutes = minutes;
-    }
-
-    public int getMinutes() {
-        return minutes;
     }
 
     private static final Map<Integer, MeditationDuration> BY_MINUTES =
