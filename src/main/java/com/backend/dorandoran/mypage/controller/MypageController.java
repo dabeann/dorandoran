@@ -3,19 +3,21 @@ package com.backend.dorandoran.mypage.controller;
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.response.CommonResponse;
+import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
+import com.backend.dorandoran.mypage.domain.response.PsychologicalChangeTrendResponse;
 import com.backend.dorandoran.mypage.service.MypageService;
 import com.backend.dorandoran.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "마이페이지", description = "마이페이지 관련 API입니다.")
 @RequestMapping("/api/mypage")
@@ -84,6 +86,16 @@ class MypageController {
     ResponseEntity<CommonResponse<PsychologicalAssessmentResponse>> getUserFirstAssessmentResult() {
         return new ResponseEntity<>(new CommonResponse<>("첫 심리검사 결과 조회",
                 mypageService.getUserFirstAssessmentResult()), HttpStatus.OK);
+    }
+
+    // TODO 심리변화 추이
+    @BasicApiSwaggerResponse
+    @ApiResponse(responseCode = "200")
+    @PostMapping("/psychological-change-trend")
+    ResponseEntity<CommonResponse<List<PsychologicalChangeTrendResponse>>> getUserPsychologicalChangeTrend(
+            @Valid @RequestBody PsychologicalChangeTrendRequest request) {
+        return new ResponseEntity<>(new CommonResponse<>("심리변화 추이 조회",
+                mypageService.getUserPsychologicalChangeTrend(request)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 로그아웃",

@@ -1,16 +1,21 @@
 package com.backend.dorandoran.mypage.repository;
 
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
+import com.backend.dorandoran.common.domain.ErrorCode;
+import com.backend.dorandoran.common.exception.CommonException;
+import com.backend.dorandoran.counsel.domain.entity.QCounsel;
+import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
+import com.backend.dorandoran.mypage.domain.response.PsychologicalChangeTrendResponse;
 import com.backend.dorandoran.user.domain.entity.QUser;
 import com.backend.dorandoran.user.domain.entity.QUserMentalState;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.ComparableExpression;
-import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
@@ -20,6 +25,7 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
 
     private final QUser user = QUser.user;
     private final QUserMentalState userMentalState = QUserMentalState.userMentalState;
+    private final QCounsel counsel = QCounsel.counsel;
 
     @Override
     public PsychologicalAssessmentResponse getUserFirstAssessmentResult(Long userId) {
@@ -49,5 +55,33 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
                 .leftJoin(userMentalState).on(user.id.eq(userMentalState.user.id))
                 .where(user.id.eq(userId))
                 .fetchFirst();
+    }
+
+    @Override
+    public List<PsychologicalChangeTrendResponse> getUserPsychologicalChangeTrend(Long userId, PsychologicalChangeTrendRequest request) {
+        NumberTemplate<Integer> dayTemplate =
+                Expressions.numberTemplate(Integer.class, "extract(day from {0})", userMentalState.createdDateTime);
+        NumberTemplate<Integer> monthTemplate =
+                Expressions.numberTemplate(Integer.class, "extract(month from {0})", userMentalState.createdDateTime);
+
+        SimpleExpression<?> category = getCategory(request);
+
+        return jpaQueryFactory.select(Projections.constructor(PsychologicalChangeTrendResponse.class,
+                        dayTemplate.as("dayOfMonth"), category, counsel.id
+                ))
+                .from(userMentalState)
+                .leftJoin(counsel).on(userMentalState.user.id.eq(counsel.user.id))
+                .where(userMentalState.user.id.eq(userId)
+                        .and(monthTemplate.eq(request.month())))
+                .fetch();
+    }
+
+    private SimpleExpression<?> getCategory(PsychologicalChangeTrendRequest request) {
+        return switch (request.category()) {
+            case ANXIETY -> userMentalState.anxiety;
+            case DEPRESSION -> userMentalState.depression;
+            case STRESS -> userMentalState.stress;
+            case BASIC -> throw new CommonException(ErrorCode.NOT_ALLOWED_CATEGORY);
+        };
     }
 }
