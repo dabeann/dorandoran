@@ -8,6 +8,7 @@ import com.backend.dorandoran.contents.service.ContentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +43,10 @@ class ContentsController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @GetMapping(value = {"/main/{category}", "/main"})
-    ResponseEntity<CommonResponse<ContentsResponse>> getMainContents(@PathVariable(name = "category", required = false) String category) {
-        return new ResponseEntity<>(new CommonResponse<>("콘텐츠 메인", contentsService.getMainContents(category)), HttpStatus.OK);
+    ResponseEntity<CommonResponse<ContentsResponse>> getMainContents(
+            @PathVariable(name = "category", required = false) String category) {
+        return new ResponseEntity<>(new CommonResponse<>("콘텐츠 메인",
+                contentsService.getMainContents(category)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 명상 시청",
@@ -51,6 +54,7 @@ class ContentsController {
                     ## 요청 :
                     - Header token (필수)
                     - String {duration} (필수)
+                        - duration : 3, 5, 10, 30, 60
                     ## 응답 :
                     - String 제목
                     - String 링크
@@ -59,7 +63,9 @@ class ContentsController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @GetMapping("/meditation/{duration}")
-    ResponseEntity<CommonResponse<MeditationResponse>> getMeditationContent(@PathVariable(name = "duration") Integer duration) {
-        return new ResponseEntity<>(new CommonResponse<>("명상 시청", contentsService.getMeditationContent(duration)), HttpStatus.OK);
+    ResponseEntity<CommonResponse<MeditationResponse>> getMeditationContent(
+            @PathVariable(name = "duration") @NotNull Integer duration) {
+        return new ResponseEntity<>(new CommonResponse<>("명상 시청",
+                contentsService.getMeditationContent(duration)), HttpStatus.OK);
     }
 }
