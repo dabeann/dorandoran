@@ -12,6 +12,7 @@ import com.backend.dorandoran.contents.domain.response.MeditationResponse;
 import com.backend.dorandoran.contents.repository.MeditationContentsRepository;
 import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
 import com.backend.dorandoran.contents.repository.QuotationRepository;
+import com.backend.dorandoran.contents.repository.querydsl.PsychotherapyContentsQueryRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.repository.UserRepository;
@@ -29,6 +30,7 @@ public class ContentsService {
     private final UserRepository userRepository;
     private final QuotationRepository quotationRepository;
     private final PsychotherapyContentsRepository psychotherapyContentsRepository;
+    private final PsychotherapyContentsQueryRepository psychotherapyContentsQueryRepository;
     private final MeditationContentsRepository meditationContentsRepository;
 
     @Transactional
@@ -73,10 +75,7 @@ public class ContentsService {
     }
 
     private List<PsychotherapyContents> getPersonalizedPsychotherapyContentsList(List<Disease> diseaseList) {
-        List<PsychotherapyContents> contentsByCategories = psychotherapyContentsRepository
-                .findAllByCategoryIn(diseaseList);
-        Collections.shuffle(contentsByCategories);
-        return contentsByCategories.stream().limit(5).toList();
+        return psychotherapyContentsQueryRepository.findRandomContentsByCategories(diseaseList, 5);
     }
 
     public MeditationResponse getMeditationContent(Integer duration) {

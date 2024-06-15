@@ -5,14 +5,12 @@ import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.CounselResult;
 import com.backend.dorandoran.common.domain.counsel.CounselState;
-import com.backend.dorandoran.common.domain.counsel.CounselorType;
 import com.backend.dorandoran.common.domain.counsel.SuggestCallCenter;
 import com.backend.dorandoran.common.domain.counsel.SuggestComment;
-import com.backend.dorandoran.common.domain.user.UserAgency;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
-import com.backend.dorandoran.contents.repository.PsychotherapyContentsRepository;
+import com.backend.dorandoran.contents.repository.querydsl.PsychotherapyContentsQueryRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import com.backend.dorandoran.counsel.domain.response.CounselHistoryResponse;
 import com.backend.dorandoran.counsel.domain.response.CounselResultResponse;
@@ -27,7 +25,6 @@ import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
 import com.backend.dorandoran.user.service.SmsUtil;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +39,7 @@ public class CounselService {
 
     private final UserRepository userRepository;
     private final CounselRepository counselRepository;
-    private final PsychotherapyContentsRepository psychotherapyContentsRepository;
+    private final PsychotherapyContentsQueryRepository psychotherapyContentsQueryRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
     private final SmsUtil smsUtil;
@@ -68,9 +65,9 @@ public class CounselService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
 
         boolean suggestVisit = isSuggestVisit(userMentalState);
-        String comment =
-                suggestVisit ? user.getName() + SuggestComment.UNSTABLE.getKoreanComment()
-                        : SuggestComment.STABLE.getKoreanComment();
+        String comment = suggestVisit
+                ? user.getName() + SuggestComment.UNSTABLE.getKoreanComment()
+                : SuggestComment.STABLE.getKoreanComment();
         List<String> phoneNumbers = getPhoneNumbers(suggestVisit);
 
         return new SuggestHospitalResponse(suggestVisit, comment, phoneNumbers);
@@ -78,13 +75,11 @@ public class CounselService {
 
     @NotNull
     private static List<String> getPhoneNumbers(boolean suggestVisit) {
-        List<String> phoneNumbers = new ArrayList<>();
-        if (suggestVisit) {
-            for (SuggestCallCenter callCenter : SuggestCallCenter.values()) {
-                phoneNumbers.add(callCenter.getPhoneNumber());
-            }
-        }
-        return phoneNumbers;
+        return suggestVisit
+                ? Arrays.stream(SuggestCallCenter.values())
+                .map(SuggestCallCenter::getPhoneNumber)
+                .toList()
+                : Collections.emptyList();
     }
 
     private static boolean isSuggestVisit(UserMentalState mentalState) {
@@ -95,11 +90,7 @@ public class CounselService {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
         User user = userRepository.findById(userId).get();
 
-        Counsel counsel = Counsel.builder()
-                .user(user)
-                .counselorType(CounselorType.COMMON_TYPE)
-                .state(CounselState.PROCEED_STATE)
-                .build();
+        Counsel counsel = Counsel.toCounselEntity(user);
         Counsel savedCounsel = counselRepository.save(counsel);
 
         return new StartCounselResponse(savedCounsel.getId(),
@@ -113,22 +104,31 @@ public class CounselService {
 
         List<Disease> diseasesList = List.of(user.getDiseases());
 
-        List<PsychotherapyContents> contentsByCategories = psychotherapyContentsRepository
-                .findAllByCategoryIn(diseasesList);
-        Collections.shuffle(contentsByCategories);
-        List<PsychotherapyContents> limitThreeContents = contentsByCategories.stream().limit(3).toList();
+        List<PsychotherapyContents> limitThreeContents = psychotherapyContentsQueryRepository
+                .findRandomContentsByCategories(diseasesList, 3);
 
-        String[] scoreStringPart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
-        int[] scores = Arrays.stream(scoreStringPart).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
+        int[] scores = getScores(resultWithSummary);
+        int totalScore = Arrays.stream(scores).sum();
 
         saveNewUserMentalState(user, scores);
 
-        int totalScore = Arrays.stream(scores).sum();
-        String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
-        result = user.getName() + result;
+        String result = getResult(user, totalScore);
         counselRepository.findById(counselId).get().updateResult(result);
         String summary = resultWithSummary.trim().split("\\r\\n")[1];
+
         return new CounselResultResponse(result, summary, limitThreeContents);
+    }
+
+    @NotNull
+    private static String getResult(User user, int totalScore) {
+        String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
+        result = user.getName() + result;
+        return result;
+    }
+
+    private static int[] getScores(String resultWithSummary) {
+        String[] scoreStringPart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
+        return Arrays.stream(scoreStringPart).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
     }
 
     private void saveNewUserMentalState(User user, int[] scores) {
