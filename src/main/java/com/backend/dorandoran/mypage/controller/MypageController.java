@@ -3,7 +3,9 @@ package com.backend.dorandoran.mypage.controller;
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.response.CommonResponse;
+import com.backend.dorandoran.mypage.domain.request.CompletedCounselRequest;
 import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
+import com.backend.dorandoran.mypage.domain.response.CompletedCounselResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
 import com.backend.dorandoran.mypage.domain.response.PsychologicalChangeTrendResponse;
 import com.backend.dorandoran.mypage.service.MypageService;
@@ -88,7 +90,17 @@ class MypageController {
                 mypageService.getUserFirstAssessmentResult()), HttpStatus.OK);
     }
 
-    // TODO 심리변화 추이
+    @Operation(summary = "summary : 심리변화 추이 조회",
+            description = """
+                    ## 요청 :
+                    - Header(Authorization Bearer *토큰* (필수))
+                    - String category (ANXIETY/DEPRESSION/STRESS) 심리 상태 카테고리
+                    - Integer month 요청 월
+                    ## 응답 :
+                    - List<Object> 심리상태 생성일 및 점수 목록
+                        - Integer dayOfMonth 상담일
+                        - Integer score 점수
+                    """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/psychological-change-trend")
@@ -96,6 +108,24 @@ class MypageController {
             @Valid @RequestBody PsychologicalChangeTrendRequest request) {
         return new ResponseEntity<>(new CommonResponse<>("심리변화 추이 조회",
                 mypageService.getUserPsychologicalChangeTrend(request)), HttpStatus.OK);
+    }
+
+    @Operation(summary = "summary : 완료한 상담 목록 조회",
+            description = """
+                    ## 요청 :
+                    - Header(Authorization Bearer *토큰* (필수))
+                    - String counselDate 상담일(yyyyMMdd 형태)
+                    ## 응답 :
+                    - List<Object> 상담 목록
+                        - Long counselId 상담번호
+                        - String title 상담 제목
+                        - String createdDate 상담일
+                    """)
+    @PostMapping("/counsel-list")
+    ResponseEntity<CommonResponse<List<CompletedCounselResponse>>> getCompletedCounselList(
+            @Valid @RequestBody CompletedCounselRequest request) {
+        return new ResponseEntity<>(new CommonResponse<>("완료한 상담 목록 조회",
+                mypageService.getCompletedCounselList(request)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 로그아웃",

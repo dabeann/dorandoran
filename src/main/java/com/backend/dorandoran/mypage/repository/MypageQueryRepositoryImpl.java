@@ -5,6 +5,7 @@ import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.counsel.domain.entity.QCounsel;
 import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
+import com.backend.dorandoran.mypage.domain.response.CompletedCounselResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
 import com.backend.dorandoran.mypage.domain.response.PsychologicalChangeTrendResponse;
 import com.backend.dorandoran.user.domain.entity.QUser;
@@ -15,6 +16,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -67,10 +71,9 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
         SimpleExpression<?> category = getCategory(request);
 
         return jpaQueryFactory.select(Projections.constructor(PsychologicalChangeTrendResponse.class,
-                        dayTemplate.as("dayOfMonth"), category, counsel.id
+                        dayTemplate.as("dayOfMonth"), category
                 ))
                 .from(userMentalState)
-                .leftJoin(counsel).on(userMentalState.user.id.eq(counsel.user.id))
                 .where(userMentalState.user.id.eq(userId)
                         .and(monthTemplate.eq(request.month())))
                 .fetch();
@@ -83,5 +86,20 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
             case STRESS -> userMentalState.stress;
             case BASIC -> throw new CommonException(ErrorCode.NOT_ALLOWED_CATEGORY);
         };
+    }
+
+    @Override
+    public List<CompletedCounselResponse> getCompletedCounselList(Long userId, String counselDate) {
+        LocalDate targetDate = LocalDate.parse(counselDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        LocalDateTime startOfDay = targetDate.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.toLocalDate().atTime(23, 59, 59);
+
+        return jpaQueryFactory.select(Projections.constructor(CompletedCounselResponse.class,
+                    counsel.id, counsel.title, counsel.createdDateTime
+                ))
+                .from(counsel)
+                .where(counsel.user.id.eq(userId)
+                        .and(counsel.createdDateTime.between(startOfDay, endOfDay)))
+                .fetch();
     }
 }
