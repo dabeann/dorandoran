@@ -8,6 +8,7 @@ import com.backend.dorandoran.contents.service.ContentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,7 +65,8 @@ class ContentsController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/meditation/{duration}")
     ResponseEntity<CommonResponse<MeditationResponse>> getMeditationContent(
-            @PathVariable(name = "duration") @NotNull Integer duration) {
+            @PathVariable(name = "duration")
+            @NotNull @Digits(integer = 2, fraction = 0, message = "숫자만 입력 가능합니다") Integer duration) {
         return new ResponseEntity<>(new CommonResponse<>("명상 시청",
                 contentsService.getMeditationContent(duration)), HttpStatus.OK);
     }
