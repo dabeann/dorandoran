@@ -2,6 +2,7 @@ package com.backend.dorandoran.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+
+import java.util.Collections;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -32,8 +35,13 @@ class SwaggerConfig {
                         .scheme(TOKEN_PREFIX)
                         .bearerFormat(HttpHeaders.AUTHORIZATION));
 
+        Server server = new Server();
+        server.setUrl("https://dorandoran.store");
+        server.setDescription("Secure Server");
+
         return new OpenAPI()
                 .addSecurityItem(securityRequirements)
-                .components(components);
+                .components(components)
+                .servers(Collections.singletonList(server));
     }
 }
