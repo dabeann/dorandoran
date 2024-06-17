@@ -146,6 +146,11 @@ public class CounselService {
 
     public Counsel validateBeforeChat(Long counselId) {
         UserInfoUtil.getUserIdOrThrow();
+        return getNotClosedCounsel(counselId);
+    }
+
+    @NotNull
+    private Counsel getNotClosedCounsel(Long counselId) {
         Counsel counsel = counselRepository.findById(counselId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
         if (counsel.getState() == CounselState.FINISH_STATE) {
@@ -171,11 +176,7 @@ public class CounselService {
 
     public ProceedCounselResponse getProceedCounsel(Long counselId) {
         UserInfoUtil.getUserIdOrThrow();
-        Counsel counsel = counselRepository.findById(counselId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
-        if (counsel.getState() == CounselState.FINISH_STATE) {
-            throw new CommonException(ErrorCode.ALREADY_CLOSED_COUNSEL);
-        }
+        Counsel counsel = getNotClosedCounsel(counselId);
         return new ProceedCounselResponse(counselId, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
     }
 
