@@ -156,7 +156,7 @@ public class CounselService {
         User user = userRepository.findById(userId).get();
         boolean isPsychTestDone = user.getDiseases() != null;
 
-        CounselState counselState = CounselState.valueOfKoreanState(state);
+        CounselState counselState = CounselState.valueOfLowerState(state);
         CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
         List<Counsel> counselListByState = counselRepository.findAllByStateAndUserOrderByCreatedDateTimeDesc(
                 counselState, user);

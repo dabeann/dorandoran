@@ -168,8 +168,8 @@ class CounselController {
                     ## 요청 :
                     - Header token (필수)
                     - String {state} (필수)
-                        - "진행중"
-                        - "종료"
+                        - "counsel" (진행중)
+                        - "complete" (종료)
                     ## 응답 :
                     - Boolean isPsychTestDone 심리 검사 여부
                     - Boolean hasCounselHistory 상담(종료,진행중 모두) 있는지 여부
