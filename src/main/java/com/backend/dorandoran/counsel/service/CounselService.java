@@ -37,7 +37,7 @@ public class CounselService {
     private final SmsUtil smsUtil;
 
     public String sendEmergencySms(String messageWithFlag, Long counselId) {
-        /*String flag = messageWithFlag.trim().split("\\r\\n")[0];
+        String flag = messageWithFlag.trim().split("\\n")[0];
 
         if (flag.equals("1")) {
             Counsel counsel = counselRepository.findById(counselId).get();
@@ -45,8 +45,7 @@ public class CounselService {
             smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
         }
 
-        return messageWithFlag.trim().split("\\r\\n")[1];*/
-        return messageWithFlag;
+        return messageWithFlag.trim().split("\\n")[1];
     }
 
     public SuggestHospitalResponse suggestHospitalVisit() {
@@ -107,7 +106,7 @@ public class CounselService {
 
         String result = getResult(user, totalScore);
         counselRepository.findById(counselId).get().updateResult(result);
-        String summary = resultWithSummary.trim().split("\\r\\n")[1];
+        String summary = resultWithSummary.trim().split("\\n")[1];
 
         return new CounselResultResponse(result, summary, limitThreeContents);
     }
