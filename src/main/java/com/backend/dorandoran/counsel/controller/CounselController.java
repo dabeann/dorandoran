@@ -65,7 +65,7 @@ class CounselController {
         String userMessage = request.message();
 
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python",
+            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
                     "src/main/java/com/backend/dorandoran/counsel/service/python/LangChainEntireDialog.py",
                     counselId, userMessage);
             processBuilder.redirectErrorStream(true);
@@ -130,7 +130,7 @@ class CounselController {
         counselService.validateBeforeEndCounsel(counselId);
         try {
 
-            ProcessBuilder processBuilder = new ProcessBuilder("python",
+            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
                     "src/main/java/com/backend/dorandoran/counsel/service/python/EndCounsel.py",
                     String.valueOf(counselId));
             processBuilder.redirectErrorStream(true);
