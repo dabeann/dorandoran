@@ -13,6 +13,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -93,7 +95,11 @@ class CounselController {
 
             return new ResponseEntity<>(new CommonResponse<>("상담 채팅", resultMessage), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new CommonResponse<>("Error: ", e.toString()), HttpStatus.BAD_REQUEST);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            return new ResponseEntity<>(new CommonResponse<>("Error: ", stackTrace), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -158,7 +164,11 @@ class CounselController {
             return new ResponseEntity<>(new CommonResponse<>("상담 결과",
                     counselService.endCounsel(counselId, resultWithSummary)), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new CommonResponse<>("Error: " + e, null),
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            return new ResponseEntity<>(new CommonResponse<>("Error: " + stackTrace, null),
                     HttpStatus.BAD_REQUEST);
         }
     }
