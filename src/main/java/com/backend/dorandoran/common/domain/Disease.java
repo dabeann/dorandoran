@@ -22,7 +22,7 @@ public enum Disease {
     private static final Map<String, Disease> BY_LOWER_NAME =
             Stream.of(values()).collect(Collectors.toMap(Disease::getLowercase, e -> e));
 
-    public static Disease valueOfKoreanName(String lowercase) {
+    public static Disease valueOfLowercase(String lowercase) {
         return BY_LOWER_NAME.get(lowercase);
     }
 }

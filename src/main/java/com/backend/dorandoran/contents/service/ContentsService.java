@@ -66,7 +66,7 @@ public class ContentsService {
     }
 
     private List<PsychotherapyContents> getPsychotherapyContentsListWithCategory(String category) {
-        Disease disease = Disease.valueOfKoreanName(category);
+        Disease disease = Disease.valueOfLowercase(category);
         CommonValidator.notNullOrThrow(disease, ErrorCode.NOT_FOUND_DISEASE);
         return psychotherapyContentsRepository.findAllByCategory(disease);
     }
