@@ -8,14 +8,19 @@ import com.backend.dorandoran.counsel.service.CounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @Tag(name = "상담", description = "상담 관련 API입니다.")
 @RequestMapping("/api/counsel")
 @RequiredArgsConstructor
@@ -37,8 +42,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/suggest")
     ResponseEntity<CommonResponse<SuggestHospitalResponse>> suggestHospitalVisit() {
-        return new ResponseEntity<>(new CommonResponse<>("전문 상담 제안", counselService.suggestHospitalVisit()),
-                HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponse<>("전문 상담 제안",
+                counselService.suggestHospitalVisit()), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 상담 채팅",
@@ -53,7 +58,7 @@ class CounselController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/chat")
-    ResponseEntity<CommonResponse<String>> getChatResult(@RequestBody ChatRequest request) {
+    ResponseEntity<CommonResponse<String>> getChatResult(@Valid @RequestBody ChatRequest request) {
         counselService.validateBeforeChat(request.counselId());
 
         String counselId = String.valueOf(request.counselId());
@@ -104,7 +109,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/start")
     ResponseEntity<CommonResponse<StartCounselResponse>> startCounsel() {
-        return new ResponseEntity<>(new CommonResponse<>("상담 시작", counselService.startCounsel()), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponse<>("상담 시작",
+                counselService.startCounsel()), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 상담 종료",
@@ -120,7 +126,7 @@ class CounselController {
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/end/{counselId}")
-    ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") Long counselId) {
+    ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") @NotNull Long counselId) {
         counselService.validateBeforeEndCounsel(counselId);
         try {
 
@@ -176,9 +182,9 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/history/{state}")
     ResponseEntity<CommonResponse<CounselHistoryResponse>> getCounselHistory(
-            @PathVariable("state") String state) {
-        return new ResponseEntity<>(new CommonResponse<>("상담 내역", counselService.getCounselHistory(state)),
-                HttpStatus.OK);
+            @PathVariable("state") @NotBlank String state) {
+        return new ResponseEntity<>(new CommonResponse<>("상담 내역",
+                counselService.getCounselHistory(state)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 진행중 상담 클릭",
@@ -195,9 +201,9 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/proceed/{counselId}")
     ResponseEntity<CommonResponse<ProceedCounselResponse>> getProceedCounsel(
-            @PathVariable("counselId") Long counselId) {
-        return new ResponseEntity<>(new CommonResponse<>("진행중 상담 클릭", counselService.getProceedCounsel(counselId)),
-                HttpStatus.OK);
+            @PathVariable("counselId") @NotNull Long counselId) {
+        return new ResponseEntity<>(new CommonResponse<>("진행중 상담 클릭",
+                counselService.getProceedCounsel(counselId)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 종료된 상담 클릭",
@@ -216,8 +222,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/finish/{counselId}")
     ResponseEntity<CommonResponse<FinishCounselResponse>> getFinishCounsel(
-            @PathVariable("counselId") Long counselId) {
-        return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭", counselService.getFinishCounsel(counselId)),
-                HttpStatus.OK);
+            @PathVariable("counselId") @NotNull Long counselId) {
+        return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
+                counselService.getFinishCounsel(counselId)), HttpStatus.OK);
     }
 }
