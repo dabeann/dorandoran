@@ -7,22 +7,22 @@ import lombok.Getter;
 
 @Getter
 public enum Disease {
-    DEPRESSION("우울증"),
-    STRESS_OVERLOAD("스트레스"),
-    ANXIETY("불안증"),
-    ALCOHOLISM("알코올_중독"),
-    SMOKING_ADDICTION("흡연_중독");
+    DEPRESSION("depression"),
+    STRESS_OVERLOAD("stress"),
+    ANXIETY("anxiety"),
+    ALCOHOLISM("alcoholism"),
+    SMOKING_ADDICTION("smoking");
 
-    private final String koreanName;
+    private final String lowercase;
 
-    Disease(String koreanName) {
-        this.koreanName = koreanName;
+    Disease(String lowercase) {
+        this.lowercase = lowercase;
     }
 
-    private static final Map<String, Disease> BY_KOREAN_NAME =
-            Stream.of(values()).collect(Collectors.toMap(Disease::getKoreanName, e -> e));
+    private static final Map<String, Disease> BY_LOWER_NAME =
+            Stream.of(values()).collect(Collectors.toMap(Disease::getLowercase, e -> e));
 
-    public static Disease valueOfKoreanName(String koreanName) {
-        return BY_KOREAN_NAME.get(koreanName);
+    public static Disease valueOfLowercase(String lowercase) {
+        return BY_LOWER_NAME.get(lowercase);
     }
 }

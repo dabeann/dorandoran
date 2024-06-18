@@ -56,7 +56,7 @@ public class ContentsService {
 
     private List<PsychotherapyContents> getPsychotherapyContentsList(User user, String category) {
         if (user.getDiseases() == null && category == null) {
-            return getPsychotherapyContentsListWithCategory(Disease.DEPRESSION.getKoreanName());
+            return getPsychotherapyContentsListWithCategory(Disease.DEPRESSION.getLowercase());
         } else if (category == null) {
             List<Disease> diseasesList = List.of(user.getDiseases());
             return getPersonalizedPsychotherapyContentsList(diseasesList);
@@ -66,7 +66,7 @@ public class ContentsService {
     }
 
     private List<PsychotherapyContents> getPsychotherapyContentsListWithCategory(String category) {
-        Disease disease = Disease.valueOfKoreanName(category);
+        Disease disease = Disease.valueOfLowercase(category);
         CommonValidator.notNullOrThrow(disease, ErrorCode.NOT_FOUND_DISEASE);
         return psychotherapyContentsRepository.findAllByCategory(disease);
     }

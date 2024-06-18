@@ -7,19 +7,19 @@ import lombok.Getter;
 
 @Getter
 public enum CounselState {
-    PROCEED_STATE("진행중"),
-    FINISH_STATE("종료");
+    PROCEED_STATE("counsel"),
+    FINISH_STATE("complete");
 
-    private final String koreanState;
+    private final String lowerState;
 
-    CounselState(String koreanState) {
-        this.koreanState = koreanState;
+    CounselState(String lowerState) {
+        this.lowerState = lowerState;
     }
 
-    private static final Map<String, CounselState> BY_KOREAN_STATE =
-            Stream.of(values()).collect(Collectors.toMap(CounselState::getKoreanState, e -> e));
+    private static final Map<String, CounselState> BY_LOWER_STATE =
+            Stream.of(values()).collect(Collectors.toMap(CounselState::getLowerState, e -> e));
 
-    public static CounselState valueOfKoreanState(String koreanState) {
-        return BY_KOREAN_STATE.get(koreanState);
+    public static CounselState valueOfLowerState(String lowerState) {
+        return BY_LOWER_STATE.get(lowerState);
     }
 }
