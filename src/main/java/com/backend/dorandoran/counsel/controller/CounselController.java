@@ -119,7 +119,7 @@ class CounselController {
                 counselService.startCounsel()), HttpStatus.OK);
     }
 
-    @Operation(summary = "summary : 상담 종료",
+    @Operation(summary = "summary : 상담 종료 & 종료된 상담 클릭",
             description = """
                     ## 요청 :
                     - Header token (필수)
@@ -127,49 +127,55 @@ class CounselController {
                     ## 응답 :
                     - String result
                     - String summary
+                    - messages : [{String role, String message, LocalDate date}, ...]
                     - contents : [{String title, String link, String thumbnailLink}, ...]
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
     @PostMapping("/end/{counselId}")
     ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") @NotNull Long counselId) {
-        counselService.validateBeforeEndCounsel(counselId);
-        try {
+        if (counselService.isFinishedCounsel(counselId)) {
+            return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
+                    counselService.getFinishCounselWithDialog(counselId)), HttpStatus.OK);
+        } else {
+            counselService.validateBeforeEndCounsel(counselId);
+            try {
 
-            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
-                    "src/main/java/com/backend/dorandoran/counsel/service/python/EndCounsel.py",
-                    String.valueOf(counselId));
-            processBuilder.redirectErrorStream(true);
+                ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
+                        "src/main/java/com/backend/dorandoran/counsel/service/python/EndCounsel.py",
+                        String.valueOf(counselId));
+                processBuilder.redirectErrorStream(true);
 
-            Process process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder output = new StringBuilder();
-            String line;
+                Process process = processBuilder.start();
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+                StringBuilder output = new StringBuilder();
+                String line;
 
-            while ((line = reader.readLine()) != null) {
-                output.append(line);
-                output.append(System.lineSeparator());
+                while ((line = reader.readLine()) != null) {
+                    output.append(line);
+                    output.append(System.lineSeparator());
+                }
+
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    return new ResponseEntity<>(
+                            new CommonResponse<>("Error: Python script execution failed with exit code "
+                                    + exitCode + "\n" + output.toString().trim(), null), HttpStatus.BAD_REQUEST);
+                }
+
+                String resultWithSummary = output.toString().trim();
+
+                return new ResponseEntity<>(new CommonResponse<>("상담 결과",
+                        counselService.endCounsel(counselId, resultWithSummary)), HttpStatus.OK);
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                String stackTrace = sw.toString();
+                return new ResponseEntity<>(new CommonResponse<>("Error: " + stackTrace, null),
+                        HttpStatus.BAD_REQUEST);
             }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                return new ResponseEntity<>(
-                        new CommonResponse<>("Error: Python script execution failed with exit code "
-                                + exitCode + "\n" + output.toString().trim(), null), HttpStatus.BAD_REQUEST);
-            }
-
-            String resultWithSummary = output.toString().trim();
-
-            return new ResponseEntity<>(new CommonResponse<>("상담 결과",
-                    counselService.endCounsel(counselId, resultWithSummary)), HttpStatus.OK);
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String stackTrace = sw.toString();
-            return new ResponseEntity<>(new CommonResponse<>("Error: " + stackTrace, null),
-                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -216,7 +222,7 @@ class CounselController {
                 counselService.getProceedCounsel(counselId)), HttpStatus.OK);
     }
 
-    @Operation(summary = "summary : 종료된 상담 클릭",
+    /*@Operation(summary = "summary : 종료된 상담 클릭",
             description = """
                     ## 요청 :
                     - Header token (필수)
@@ -235,5 +241,5 @@ class CounselController {
             @PathVariable("counselId") @NotNull Long counselId) {
         return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
                 counselService.getFinishCounsel(counselId)), HttpStatus.OK);
-    }
+    }*/
 }

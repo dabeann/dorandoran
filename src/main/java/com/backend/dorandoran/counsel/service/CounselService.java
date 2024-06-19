@@ -105,10 +105,12 @@ public class CounselService {
         saveNewUserMentalState(user, scores);
 
         String result = getResult(user, totalScore);
-        counselRepository.findById(counselId).get().updateResult(result);
+        Counsel counsel = counselRepository.findById(counselId).get();
+        counsel.updateResult(result);
         String summary = resultWithSummary.trim().split("\\n")[1];
 
-        return new CounselResultResponse(result, summary, limitThreeContents);
+        return new CounselResultResponse(result, summary,
+                dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel), limitThreeContents);
     }
 
     @NotNull
@@ -119,7 +121,7 @@ public class CounselService {
     }
 
     private static int[] getScores(String resultWithSummary) {
-        String[] scoreStringPart = resultWithSummary.trim().split("\\r\\n")[0].trim().split(",");
+        String[] scoreStringPart = resultWithSummary.trim().split("\\n")[0].trim().split(",");
         return Arrays.stream(scoreStringPart).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
     }
 
@@ -128,6 +130,12 @@ public class CounselService {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
         UserMentalState userMentalState = UserMentalState.toUserMentalStateEntity(user, previousMentalState, scores);
         userMentalStateRepository.save(userMentalState);
+    }
+
+    public boolean isFinishedCounsel(Long counselId) {
+        Counsel counsel = counselRepository.findById(counselId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
+        return counsel.getState() != CounselState.PROCEED_STATE;
     }
 
     @Transactional
@@ -180,5 +188,22 @@ public class CounselService {
             throw new CommonException(ErrorCode.STILL_PROCEED_COUNSEL);
         }
         return new FinishCounselResponse(counsel, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
+    }
+
+    public CounselResultResponse getFinishCounselWithDialog(Long counselId) {
+        Long userId = UserInfoUtil.getUserIdOrThrow();
+        User user = userRepository.findById(userId).get();
+        List<Disease> diseasesList = List.of(user.getDiseases());
+
+        Counsel counsel = counselRepository.findById(counselId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
+        if (counsel.getState() == CounselState.PROCEED_STATE) {
+            throw new CommonException(ErrorCode.STILL_PROCEED_COUNSEL);
+        }
+        List<PsychotherapyContents> limitThreeContents = psychotherapyContentsQueryRepository
+                .findRandomContentsByCategories(diseasesList, 3);
+
+        return new CounselResultResponse(counsel.getResult(), counsel.getSummary(),
+                dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel), limitThreeContents);
     }
 }
