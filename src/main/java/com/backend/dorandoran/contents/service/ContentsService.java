@@ -55,9 +55,7 @@ public class ContentsService {
     }
 
     private List<PsychotherapyContents> getPsychotherapyContentsList(User user, String category) {
-        if (user.getDiseases() == null && category == null) {
-            return getPsychotherapyContentsListWithCategory(Disease.DEPRESSION.getLowercase());
-        } else if (category == null) {
+        if (category.equals("personal")) {
             List<Disease> diseasesList = List.of(user.getDiseases());
             return getPersonalizedPsychotherapyContentsList(diseasesList);
         } else {

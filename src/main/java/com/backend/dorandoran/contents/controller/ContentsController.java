@@ -32,10 +32,8 @@ class ContentsController {
             description = """
                     ## 요청 :
                     - Header token (필수)
-                    - String {category} (필수X)
-                        - '당신을 위한 콘텐츠' 일 경우 /main 호출 (category X)
-                        - 그 외 경우 병명 넘기기 ("depression", "stress", "anxiety", "alcoholism", "smoking")
-                        - 심리검사 안 한 경우 /main 호출 -> '우울증' 심리치료 콘텐츠 나옴
+                    - String {category} (필수)
+                        - "depression", "stress", "anxiety", "alcoholism", "smoking", "personal"
                     ## 응답 :
                     - String 명언 (심리검사 안 한 경우 null)
                     - 심리 치료 리스트
@@ -45,7 +43,7 @@ class ContentsController {
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @GetMapping(value = {"/main/{category}", "/main"})
+    @GetMapping("/main/{category}")
     ResponseEntity<CommonResponse<ContentsResponse>> getMainContents(
             @PathVariable(name = "category", required = false) String category) {
         return new ResponseEntity<>(new CommonResponse<>("콘텐츠 메인",

@@ -1,6 +1,7 @@
 package com.backend.dorandoran.counsel.domain.response;
 
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
+import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Getter;
 public class CounselResultResponse {
     private String result;
     private String summary;
+    private List<DialogHistory> messages;
     private List<CounselResultPsychotherapyContents> contents;
 
     @AllArgsConstructor
@@ -27,9 +29,10 @@ public class CounselResultResponse {
         }
     }
 
-    public CounselResultResponse(String result, String summary, List<PsychotherapyContents> psychotherapyContentsList) {
+    public CounselResultResponse(String result, String summary, List<Dialog> dialogs, List<PsychotherapyContents> psychotherapyContentsList) {
         this.result = result;
         this.summary = summary;
+        this.messages = dialogs.stream().map(DialogHistory::new).toList();
         this.contents = psychotherapyContentsList.stream()
                 .map(CounselResultPsychotherapyContents::new)
                 .toList();
