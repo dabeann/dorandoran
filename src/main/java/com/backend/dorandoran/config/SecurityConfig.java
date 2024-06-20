@@ -53,6 +53,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "https://dorandoran.store",
                         "http://dorandoran.store",
+                        "https://dorandoran-gamma.vercel.app",
                         "http://localhost:8008",
                         "http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
