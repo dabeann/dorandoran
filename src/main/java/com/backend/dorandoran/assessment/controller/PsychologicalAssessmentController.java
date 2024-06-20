@@ -72,6 +72,7 @@ class PsychologicalAssessmentController {
                         - String category 카테고리
                         - Integer score 점수
                         - Integer percent 퍼센트(%)
+                        - String standard 기준 (적음, 중간, 심각)
                     - 예시
                         {
                             "message": "심리검사 결과 분석",
@@ -82,17 +83,20 @@ class PsychologicalAssessmentController {
                                     {
                                         "category": "DEPRESSION",
                                         "score": 67,
-                                        "percent": 33
+                                        "percent": 33,
+                                        "standard": "중간"
                                     },
                                     {
                                         "category": "STRESS",
                                         "score": 60,
-                                        "percent": 40
+                                        "percent": 40,
+                                        "standard": "중간"
                                     },
                                     {
                                         "category": "ANXIETY",
                                         "score": 73,
-                                        "percent": 27
+                                        "percent": 27,
+                                        "standard": "중간"
                                     }
                                 ]
                             }
