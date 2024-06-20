@@ -8,12 +8,12 @@ public class UserInfoUtil {
 
     public static Long getUserIdOrDefault() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        return !userId.trim().equals("Anonymous") ? Long.parseLong(userId) : 0L;
+        return !userId.trim().equals("anonymousUser") ? Long.parseLong(userId) : 0L;
     }
 
     public static Long getUserIdOrThrow() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (userId.trim().equals("Anonymous")) {
+        if (userId.trim().equals("anonymousUser")) {
             throw new CommonException(ErrorCode.EMPTY_TOKEN);
         }
         return Long.parseLong(userId);

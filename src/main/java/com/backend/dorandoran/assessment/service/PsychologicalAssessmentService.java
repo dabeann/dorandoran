@@ -6,7 +6,8 @@ import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessment
 import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
-import com.backend.dorandoran.common.domain.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentStandard;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.contents.domain.entity.Quotation;
 import com.backend.dorandoran.contents.repository.QuotationRepository;
@@ -112,12 +113,25 @@ public class PsychologicalAssessmentService {
         int userTotalPoints = calculateTotalPoints(requests);
         int maxPoints = calculateMaxPoints(requests);
         int percent = calculatePercentage(userTotalPoints, maxPoints);
+        PsychologicalAssessmentStandard standard = calculateStandard(userTotalPoints, requests.category());
 
         return PsychologicalAssessmentResponse.PsychologicalAssessmentResult.builder()
                 .category(requests.category())
                 .score(PERCENTAGE_SCALE - percent)
                 .percent(percent)
+                .standard(standard)
                 .build();
+    }
+
+    private PsychologicalAssessmentStandard calculateStandard(int userTotalPoints, PsychologicalAssessmentCategory category) {
+        PsychologicalAssessmentStandard standard = PsychologicalAssessmentStandard.적음;
+        int mediumMaxPoint = category.equals(PsychologicalAssessmentCategory.STRESS) ? 21 : 16;
+        if (userTotalPoints >= 8 && userTotalPoints < mediumMaxPoint) {
+            standard = PsychologicalAssessmentStandard.중간;
+        } else if (userTotalPoints >= mediumMaxPoint) {
+            standard = PsychologicalAssessmentStandard.심각;
+        }
+        return standard;
     }
 
     private static int calculateTotalPoints(PsychologicalAssessmentRequest requests) {

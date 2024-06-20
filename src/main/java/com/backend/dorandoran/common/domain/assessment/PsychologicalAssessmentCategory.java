@@ -1,4 +1,4 @@
-package com.backend.dorandoran.common.domain;
+package com.backend.dorandoran.common.domain.assessment;
 
 public enum PsychologicalAssessmentCategory {
 

@@ -1,6 +1,6 @@
 package com.backend.dorandoran.assessment.domain.request;
 
-import com.backend.dorandoran.common.domain.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentCategory;
 
 import java.util.List;
 

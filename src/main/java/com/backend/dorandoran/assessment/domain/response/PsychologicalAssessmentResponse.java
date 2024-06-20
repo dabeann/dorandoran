@@ -1,6 +1,7 @@
 package com.backend.dorandoran.assessment.domain.response;
 
-import com.backend.dorandoran.common.domain.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentStandard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class PsychologicalAssessmentResponse {
         PsychologicalAssessmentCategory category;
         Integer score;
         Integer percent;
+        PsychologicalAssessmentStandard standard;
     }
 
     public PsychologicalAssessmentResponse(String name, LocalDateTime testDate, Integer anxiety, Integer depression, Integer stress) {

@@ -1,7 +1,7 @@
 package com.backend.dorandoran.assessment.domain.entity;
 
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
-import com.backend.dorandoran.common.domain.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.backend.dorandoran.mypage.domain.request;
 
-import com.backend.dorandoran.common.domain.PsychologicalAssessmentCategory;
+import com.backend.dorandoran.common.domain.assessment.PsychologicalAssessmentCategory;
 import jakarta.validation.constraints.Digits;
 import org.jetbrains.annotations.NotNull;
 
