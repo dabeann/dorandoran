@@ -113,7 +113,7 @@ class CounselController {
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @PostMapping("/start")
+    @GetMapping("/start")
     ResponseEntity<CommonResponse<StartCounselResponse>> startCounsel() {
         return new ResponseEntity<>(new CommonResponse<>("상담 시작",
                 counselService.startCounsel()), HttpStatus.OK);
