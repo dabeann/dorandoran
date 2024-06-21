@@ -113,7 +113,7 @@ class CounselController {
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @PostMapping("/start")
+    @GetMapping("/start")
     ResponseEntity<CommonResponse<StartCounselResponse>> startCounsel() {
         return new ResponseEntity<>(new CommonResponse<>("상담 시작",
                 counselService.startCounsel()), HttpStatus.OK);
@@ -132,7 +132,7 @@ class CounselController {
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
-    @PostMapping("/end/{counselId}")
+    @GetMapping("/end/{counselId}")
     ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") @NotNull Long counselId) {
         if (counselService.isFinishedCounsel(counselId)) {
             return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
