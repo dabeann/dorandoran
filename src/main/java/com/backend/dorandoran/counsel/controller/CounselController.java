@@ -5,6 +5,7 @@ import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
 import com.backend.dorandoran.counsel.domain.response.*;
 import com.backend.dorandoran.counsel.service.CounselService;
+import com.backend.dorandoran.counsel.service.CounselChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 class CounselController {
 
     private final CounselService counselService;
+    private final CounselChatService counselGptService;
 
     @Operation(summary = "summary : 전문 상담 제안",
             description = """
@@ -61,46 +63,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/chat")
     ResponseEntity<CommonResponse<String>> getChatResult(@Valid @RequestBody ChatRequest request) {
-        counselService.validateBeforeChat(request.counselId());
-
-        String counselId = String.valueOf(request.counselId());
-        String userMessage = request.message();
-
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
-                    "src/main/java/com/backend/dorandoran/counsel/service/python/LangChainEntireDialog.py",
-                    counselId, userMessage);
-            processBuilder.redirectErrorStream(true);
-
-            Process process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder output = new StringBuilder();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                output.append(line);
-                output.append(System.lineSeparator());
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                return new ResponseEntity<>(
-                        new CommonResponse<>("Error: Python script execution failed with exit code ",
-                                exitCode + "\n" + output.toString().trim()), HttpStatus.BAD_REQUEST);
-            }
-
-            String result = output.toString().trim();
-            String resultMessage = counselService.sendEmergencySms(result, request.counselId());
-
-            return new ResponseEntity<>(new CommonResponse<>("상담 채팅", resultMessage), HttpStatus.OK);
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String stackTrace = sw.toString();
-            return new ResponseEntity<>(new CommonResponse<>("Error: ", stackTrace), HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(new CommonResponse<>("상담 채팅",
+                counselGptService.getChatResult(request)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 상담 시작",
