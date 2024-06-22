@@ -73,9 +73,18 @@ public class UserService {
         Authentication authentication = jwtUtil.getAuthenticationByUserId(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(authentication);
 
-        UserToken userToken = userTokenRepository.findByUserId(user.getId());
-        userToken.updateRefreshToken(refreshToken);
+        Optional<UserToken> optionalUserToken = userTokenRepository.findByUserId(user.getId());
+        if (optionalUserToken.isPresent()) {
+            optionalUserToken.get().updateRefreshToken(refreshToken);
+        } else {
+            saveUserToken(user, refreshToken);
+        }
         return jwtUtil.createAccessToken(authentication);
+    }
+
+    private void saveUserToken(User user, String refreshToken) {
+        UserToken userToken = UserToken.toUserTokenEntity(user.getId(), refreshToken);
+        userTokenRepository.save(userToken);
     }
 
     @Transactional
@@ -90,8 +99,7 @@ public class UserService {
         Authentication authentication = jwtUtil.getAuthenticationByUserId(user.getId());
 
         String refreshToken = jwtUtil.createRefreshToken(authentication);
-        UserToken userToken = UserToken.toUserTokenEntity(user.getId(), refreshToken);
-        userTokenRepository.save(userToken);
+        saveUserToken(user, refreshToken);
         return jwtUtil.createAccessToken(authentication);
     }
 

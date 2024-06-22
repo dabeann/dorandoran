@@ -100,7 +100,8 @@ public class JwtUtil {
     }
 
     public String reissuedAccessToken(Long userId) {
-        UserToken userToken = userTokenRepository.findByUserId(userId);
+        UserToken userToken = userTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommonException(ErrorCode.EMPTY_TOKEN));
         String refreshToken = userToken.getRefreshToken();
 
         if (!validateToken(refreshToken)) {
