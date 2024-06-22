@@ -4,11 +4,13 @@ import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
 import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.*;
+import com.backend.dorandoran.common.domain.dialog.DialogRole;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
 import com.backend.dorandoran.contents.repository.querydsl.PsychotherapyContentsQueryRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
+import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.*;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.counsel.repository.DialogRepository;
@@ -16,7 +18,6 @@ import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
-import com.backend.dorandoran.user.service.SmsUtil;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,19 +35,6 @@ public class CounselService {
     private final PsychotherapyContentsQueryRepository psychotherapyContentsQueryRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
-    private final SmsUtil smsUtil;
-
-    public String sendEmergencySms(String messageWithFlag, Long counselId) {
-        String flag = messageWithFlag.trim().split("\\n")[0];
-
-        if (flag.equals("1")) {
-            Counsel counsel = counselRepository.findById(counselId).get();
-            User user = counsel.getUser();
-            smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
-        }
-
-        return messageWithFlag.trim().split("\\n")[1];
-    }
 
     public SuggestHospitalResponse suggestHospitalVisit() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
@@ -84,6 +72,11 @@ public class CounselService {
 
         Counsel counsel = Counsel.toCounselEntity(user);
         Counsel savedCounsel = counselRepository.save(counsel);
+        Dialog dialog = Dialog.builder()
+                .counsel(counsel)
+                .role(DialogRole.FROM_CONSULTANT)
+                .contents("안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.").build();
+        dialogRepository.save(dialog);
 
         return new StartCounselResponse(savedCounsel.getId(),
                 "안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.");
@@ -178,16 +171,6 @@ public class CounselService {
         UserInfoUtil.getUserIdOrThrow();
         Counsel counsel = getNotClosedCounsel(counselId);
         return new ProceedCounselResponse(counselId, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
-    }
-
-    public FinishCounselResponse getFinishCounsel(Long counselId) {
-        UserInfoUtil.getUserIdOrThrow();
-        Counsel counsel = counselRepository.findById(counselId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
-        if (counsel.getState() == CounselState.PROCEED_STATE) {
-            throw new CommonException(ErrorCode.STILL_PROCEED_COUNSEL);
-        }
-        return new FinishCounselResponse(counsel, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
     }
 
     public CounselResultResponse getFinishCounselWithDialog(Long counselId) {

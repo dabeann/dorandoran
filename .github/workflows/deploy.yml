@@ -30,6 +30,7 @@ jobs:
           echo "${{ secrets.REDIS_YML }}" | base64 --decode > src/main/resources/application-redis.yml
           echo "${{ secrets.DATABASE_YML }}" | base64 --decode > src/main/resources/application-database.yml
           echo "${{ secrets.JWT_YML }}" | base64 --decode > src/main/resources/application-jwt.yml
+          echo "${{ secrets.GPT_YML }}" | base64 --decode > src/main/resources/application-gpt.yml
           echo "${{ secrets.ENV }}" | base64 --decode > src/main/java/com/backend/dorandoran/counsel/service/python/.env
           find src
         shell: bash

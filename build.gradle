@@ -56,6 +56,14 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	// json
+	implementation group: 'org.json', name: 'json', version: '20090211'
+
+	// gpt
+	implementation "com.theokanning.openai-gpt3-java:api.0.13.0"
+	implementation "com.theokanning.openai-gpt3-java:service:0.13.0"
+	implementation 'com.openai:openai:2.1.1'
 }
 
 tasks.named('test') {

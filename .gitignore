@@ -48,6 +48,7 @@ application-jwt.yml
 
 ### gpt api ###
 .env
+application-gpt.yml
 
 # generated
 src/main/generated
