@@ -46,7 +46,10 @@ public enum ErrorCode {
     NOT_FOUND_COUNSEL_STATE(BAD_REQUEST, "존재하지 않는 상담 상태입니다."),
 
     // meditation duration
-    NOT_FOUND_MEDITATION_DURATION(BAD_REQUEST, "존재하지 않는 명상 기간입니다.");
+    NOT_FOUND_MEDITATION_DURATION(BAD_REQUEST, "존재하지 않는 명상 기간입니다."),
+
+    // gpt
+    GPT_ERROR(BAD_REQUEST, "gpt api관련 에러입니다");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
