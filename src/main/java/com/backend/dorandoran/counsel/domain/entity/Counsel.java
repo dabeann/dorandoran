@@ -62,6 +62,10 @@ public class Counsel extends BaseDateTimeEntity {
         this.result = result;
     }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     public static Counsel toCounselEntity(User user) {
         return Counsel.builder()
                 .user(user)
