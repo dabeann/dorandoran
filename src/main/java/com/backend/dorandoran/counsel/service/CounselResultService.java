@@ -116,23 +116,30 @@ public class CounselResultService {
     @Transactional
     public String updatePsychologyScoreAndGetResult(Counsel counsel, User user, List<Dialog> dialogHistory) {
         String history = getDialogHistory(dialogHistory);
+        while (true) {
+            try {
+                List<ChatMessage> chatMessages = generatedPsychologyScoreChatMessage(history);
+                String stringScores = sendOpenAIRequest4o(chatMessages).getChoices().get(0).getMessage().getContent();
 
-        try {
-            List<ChatMessage> chatMessages = generatedPsychologyScoreChatMessage(history);
-            String stringScores = sendOpenAIRequest4o(chatMessages).getChoices().get(0).getMessage().getContent();
+                int[] scores;
+                int totalScore;
+                try {
+                    scores = Arrays.stream(stringScores.trim().split(","))
+                            .mapToInt(s -> Integer.parseInt(s.trim())).toArray();
+                    totalScore = Arrays.stream(scores).sum();
+                } catch (Exception e) {
+                    continue;
+                }
 
-            int[] scores = Arrays.stream(stringScores.trim().split(","))
-                    .mapToInt(s -> Integer.parseInt(s.trim())).toArray();
-            int totalScore = Arrays.stream(scores).sum();
+                saveNewUserMentalState(user, scores);
+                String result = getResult(user, totalScore);
+                counsel.updateResult(result);
 
-            saveNewUserMentalState(user, scores);
-            String result = getResult(user, totalScore);
-            counsel.updateResult(result);
-
-            return result;
-        } catch (Exception e) {
-            log.error("Error", e);
-            throw new CommonException(ErrorCode.GPT_ERROR);
+                return result;
+            } catch (Exception e) {
+                log.error("Error", e);
+                throw new CommonException(ErrorCode.GPT_ERROR);
+            }
         }
     }
 
