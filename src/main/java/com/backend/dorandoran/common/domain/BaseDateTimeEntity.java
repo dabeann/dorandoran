@@ -22,4 +22,8 @@ public abstract class BaseDateTimeEntity {
     @LastModifiedDate
     @Column(name = "updated_date_time")
     private LocalDateTime updatedDateTime;
+
+    public void setUpdatedDateTime(LocalDateTime updatedDateTime) {
+        this.updatedDateTime = updatedDateTime;
+    }
 }
