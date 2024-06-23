@@ -4,6 +4,7 @@ import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.domain.response.CommonResponse;
 import com.backend.dorandoran.counsel.domain.request.ChatRequest;
 import com.backend.dorandoran.counsel.domain.response.*;
+import com.backend.dorandoran.counsel.service.CounselResultService;
 import com.backend.dorandoran.counsel.service.CounselService;
 import com.backend.dorandoran.counsel.service.CounselChatService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,11 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +28,7 @@ class CounselController {
 
     private final CounselService counselService;
     private final CounselChatService counselGptService;
+    private final CounselResultService counselResultService;
 
     @Operation(summary = "summary : 전문 상담 제안",
             description = """
@@ -98,49 +95,8 @@ class CounselController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/end/{counselId}")
     ResponseEntity<CommonResponse<CounselResultResponse>> endCounsel(@PathVariable("counselId") @NotNull Long counselId) {
-        if (counselService.isFinishedCounsel(counselId)) {
-            return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
-                    counselService.getFinishCounselWithDialog(counselId)), HttpStatus.OK);
-        } else {
-            counselService.validateBeforeEndCounsel(counselId);
-            try {
-
-                ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/python3",
-                        "src/main/java/com/backend/dorandoran/counsel/service/python/EndCounsel.py",
-                        String.valueOf(counselId));
-                processBuilder.redirectErrorStream(true);
-
-                Process process = processBuilder.start();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-                StringBuilder output = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    output.append(line);
-                    output.append(System.lineSeparator());
-                }
-
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    return new ResponseEntity<>(
-                            new CommonResponse<>("Error: Python script execution failed with exit code "
-                                    + exitCode + "\n" + output.toString().trim(), null), HttpStatus.BAD_REQUEST);
-                }
-
-                String resultWithSummary = output.toString().trim();
-
-                return new ResponseEntity<>(new CommonResponse<>("상담 결과",
-                        counselService.endCounsel(counselId, resultWithSummary)), HttpStatus.OK);
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                String stackTrace = sw.toString();
-                return new ResponseEntity<>(new CommonResponse<>("Error: " + stackTrace, null),
-                        HttpStatus.BAD_REQUEST);
-            }
-        }
+        return new ResponseEntity<>(new CommonResponse<>("상담 종료 & 종료된 상담 클릭",
+                    counselResultService.endCounsel(counselId)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 상담 내역",
@@ -185,25 +141,4 @@ class CounselController {
         return new ResponseEntity<>(new CommonResponse<>("진행중 상담 클릭",
                 counselService.getProceedCounsel(counselId)), HttpStatus.OK);
     }
-
-    /*@Operation(summary = "summary : 종료된 상담 클릭",
-            description = """
-                    ## 요청 :
-                    - Header token (필수)
-                    - Long {counselId} (필수)
-                    ## 응답 :
-                    - Long counselId
-                    - String result
-                    - String summary
-                    - messages [{String role, String message}, ...]
-                        - role: "상담원" or "내담자"
-                    """)
-    @BasicApiSwaggerResponse
-    @ApiResponse(responseCode = "200")
-    @GetMapping("/finish/{counselId}")
-    ResponseEntity<CommonResponse<FinishCounselResponse>> getFinishCounsel(
-            @PathVariable("counselId") @NotNull Long counselId) {
-        return new ResponseEntity<>(new CommonResponse<>("종료된 상담 클릭",
-                counselService.getFinishCounsel(counselId)), HttpStatus.OK);
-    }*/
 }

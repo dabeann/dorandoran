@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class CounselChatService {
     private final OpenAiService openAiService;
 
 
+    @Transactional
     public String getChatResult(ChatRequest request) {
         Long counselId = request.counselId();
         String userMessage = request.message();
@@ -72,6 +74,9 @@ public class CounselChatService {
                 Dialog.builder().counsel(counsel).role(DialogRole.FROM_USER).contents(userMessage).build());
         dialogRepository.save(
                 Dialog.builder().counsel(counsel).role(DialogRole.FROM_CONSULTANT).contents(gptResponse).build());
+
+        counsel.updateUpdatedDateNow();
+
         return gptResponse;
     }
 
@@ -79,8 +84,8 @@ public class CounselChatService {
         ChatCompletionRequest build = ChatCompletionRequest.builder()
                 .messages(prompt)
                 .maxTokens(GptConfig.MAX_TOKEN)
-                .temperature(GptConfig.TEMPERATURE)
-                .topP(GptConfig.TOP_P)
+                .temperature(0.2)
+                .topP(0.2)
                 .model(MODEL_NAME)
                 .build();
 
@@ -102,14 +107,19 @@ public class CounselChatService {
     private List<ChatMessage> generatedQuestionAndAnswerMessage(String message, String history, User user) {
         List<ChatMessage> messages = new ArrayList<>();
 
-        String systemMessage = "당신은 노숙인을 대상으로 심리상담을 제공하는 상담봇입니다. "
-                + "노숙인 정보 : 이름 : " + user.getName() + "., "
-                + "미러링, 자기공개, 요약 등을 통해 심리상담합니다. 제공한 노숙인 정보를 바탕으로 "
-                + "개인화된 상담을 진행합니다. 대화중에 내담자, 당신 단어 대신에 노숙인의 이름을 말해줍니다.";
+        String systemMessage = "당신은 노숙인 " + user.getName() + "님의 담당 상담사입니다. 당신은 노숙인 " + user.getName()
+                + "님의 감정을 안정화하도록 돕는 역할입니다. 센터 등 자원을 찾아주거나 다른 곳과 연결한다고 말하지 않습니다. "
+                + "여러분, 당신이라는 단어를 절대 사용하지 않습니다.";
         ChatMessage systemMsg = new ChatMessage(ChatMessageRole.SYSTEM.toString().toLowerCase(), systemMessage);
         messages.add(systemMsg);
 
-        ChatMessage assistantMsg = new ChatMessage(ChatMessageRole.ASSISTANT.toString().toLowerCase(), history);
+        String assistantMessage = "반드시 최근 " + history + "를 기반으로 문맥이 이어지게 상담합니다. 내담자, 당신 대신 "
+                + user.getName()
+                + "로 호칭합니다. 해결이 가능한 고민에 대해서는 해결책을 제안합니다. 다음과 같은 상담 기법을 상황에 맞게 적절하게 사용합니다. "
+                + "한 기법만 반복하지 않습니다. 1. 미러링 : " + user.getName() + "님의 말을 비슷한 의미의 문장으로 변화해서 말해줍니다. "
+                + "2. 자기공개 : " + user.getName() + "이 말한 상황과 비슷한 상황을 경험한 내용을 말하여 공감을 이끌어냅니다. "
+                + "가끔씩 대화 중간에 내담자의 자존감을 놉여줄 수 있는 문장을 말합니다.";
+        ChatMessage assistantMsg = new ChatMessage(ChatMessageRole.ASSISTANT.toString().toLowerCase(), assistantMessage);
         messages.add(assistantMsg);
 
         ChatMessage userMsg = new ChatMessage(ChatMessageRole.USER.toString().toLowerCase(), message);
@@ -119,7 +129,8 @@ public class CounselChatService {
     }
 
     private String getChatGptResponse(Counsel counsel, String userMessage, User user) {
-        List<Dialog> previousConversations = dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel);
+        PageRequest pageRequest = PageRequest.of(0, 4);
+        List<Dialog> previousConversations = dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel, pageRequest);
         String history = previousConversations.stream()
                 .map(conv -> String.format("{\"role\": \"%s\", \"content\": \"%s\"}", conv.getRole(),
                         conv.getContents()))
@@ -167,7 +178,8 @@ public class CounselChatService {
     private List<ChatMessage> checkEmergencyStatus(String userMessage) {
         List<ChatMessage> messages = new ArrayList<>();
 
-        String systemMessage = "다음 사용자 메시지가 위급상황인지 판단해서 위급하면 1, 그렇지 않다면 0을 반환해줘.: " + userMessage;
+        String systemMessage = "자살, 자해 등과 같이 사용자 메시지에 위급상황으로 판단되는 문맥 또는 단어가 발견되면 1, "
+                + "그렇지 않다면 0을 반환해: " + userMessage;
         ChatMessage systemMsg = new ChatMessage(ChatMessageRole.SYSTEM.toString().toLowerCase(), systemMessage);
         messages.add(systemMsg);
 
@@ -175,11 +187,16 @@ public class CounselChatService {
     }
 
     private void checkEmergencyAndSendSms(String userMessage, User user) {
-        List<ChatMessage> chatMessages = checkEmergencyStatus(userMessage);
-        String flag = sendOpenAIRequest4o(chatMessages).getChoices().get(0).getMessage().getContent();
+        while (true) {
+            List<ChatMessage> chatMessages = checkEmergencyStatus(userMessage);
+            String flag = sendOpenAIRequest4o(chatMessages).getChoices().get(0).getMessage().getContent();
 
-        if (flag.equals("1")) {
-            smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
+            if (flag.equals("1")) {
+                smsUtil.sendEmergencySms(user.getUserAgency().getPhoneNumber(), user.getName(), user.getPhoneNumber());
+                break;
+            } else if (flag.equals("0")) {
+                break;
+            }
         }
     }
 }

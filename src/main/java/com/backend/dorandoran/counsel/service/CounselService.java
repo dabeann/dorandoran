@@ -1,14 +1,11 @@
 package com.backend.dorandoran.counsel.service;
 
 import com.backend.dorandoran.assessment.repository.UserMentalStateRepository;
-import com.backend.dorandoran.common.domain.Disease;
 import com.backend.dorandoran.common.domain.ErrorCode;
 import com.backend.dorandoran.common.domain.counsel.*;
 import com.backend.dorandoran.common.domain.dialog.DialogRole;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.common.validator.CommonValidator;
-import com.backend.dorandoran.contents.domain.entity.PsychotherapyContents;
-import com.backend.dorandoran.contents.repository.querydsl.PsychotherapyContentsQueryRepository;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.*;
@@ -24,7 +21,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -32,7 +28,6 @@ public class CounselService {
 
     private final UserRepository userRepository;
     private final CounselRepository counselRepository;
-    private final PsychotherapyContentsQueryRepository psychotherapyContentsQueryRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
 
@@ -82,66 +77,6 @@ public class CounselService {
                 "안녕하세요 " + user.getName() + "님! 어떤 내용이든 좋으니, 저에게 마음편히 이야기해주세요.");
     }
 
-    @Transactional
-    public CounselResultResponse endCounsel(Long counselId, String resultWithSummary) {
-        final Long userId = UserInfoUtil.getUserIdOrThrow();
-        User user = userRepository.findById(userId).get();
-
-        List<Disease> diseasesList = List.of(user.getDiseases());
-
-        List<PsychotherapyContents> limitThreeContents = psychotherapyContentsQueryRepository
-                .findRandomContentsByCategories(diseasesList, 3);
-
-        int[] scores = getScores(resultWithSummary);
-        int totalScore = Arrays.stream(scores).sum();
-
-        saveNewUserMentalState(user, scores);
-
-        String result = getResult(user, totalScore);
-        Counsel counsel = counselRepository.findById(counselId).get();
-        counsel.updateResult(result);
-        String summary = resultWithSummary.trim().split("\\n")[1];
-
-        return new CounselResultResponse(result, summary,
-                dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel), limitThreeContents);
-    }
-
-    @NotNull
-    private static String getResult(User user, int totalScore) {
-        String result = totalScore >= 0 ? CounselResult.GOOD.getKoreanResult() : CounselResult.BAD.getKoreanResult();
-        result = user.getName() + result;
-        return result;
-    }
-
-    private static int[] getScores(String resultWithSummary) {
-        String[] scoreStringPart = resultWithSummary.trim().split("\\n")[0].trim().split(",");
-        return Arrays.stream(scoreStringPart).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
-    }
-
-    private void saveNewUserMentalState(User user, int[] scores) {
-        UserMentalState previousMentalState = userMentalStateRepository.findFirstByUserOrderByCreatedDateTimeDesc(user)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
-        UserMentalState userMentalState = UserMentalState.toUserMentalStateEntity(user, previousMentalState, scores);
-        userMentalStateRepository.save(userMentalState);
-    }
-
-    public boolean isFinishedCounsel(Long counselId) {
-        Counsel counsel = counselRepository.findById(counselId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
-        return counsel.getState() != CounselState.PROCEED_STATE;
-    }
-
-    @Transactional
-    public void validateBeforeEndCounsel(Long counselId) {
-        Counsel counsel = validateBeforeChat(counselId);
-        counsel.updateState(CounselState.FINISH_STATE);
-    }
-
-    public Counsel validateBeforeChat(Long counselId) {
-        UserInfoUtil.getUserIdOrThrow();
-        return getNotClosedCounsel(counselId);
-    }
-
     @NotNull
     private Counsel getNotClosedCounsel(Long counselId) {
         Counsel counsel = counselRepository.findById(counselId)
@@ -171,22 +106,5 @@ public class CounselService {
         UserInfoUtil.getUserIdOrThrow();
         Counsel counsel = getNotClosedCounsel(counselId);
         return new ProceedCounselResponse(counselId, dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel));
-    }
-
-    public CounselResultResponse getFinishCounselWithDialog(Long counselId) {
-        Long userId = UserInfoUtil.getUserIdOrThrow();
-        User user = userRepository.findById(userId).get();
-        List<Disease> diseasesList = List.of(user.getDiseases());
-
-        Counsel counsel = counselRepository.findById(counselId)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUNSEL));
-        if (counsel.getState() == CounselState.PROCEED_STATE) {
-            throw new CommonException(ErrorCode.STILL_PROCEED_COUNSEL);
-        }
-        List<PsychotherapyContents> limitThreeContents = psychotherapyContentsQueryRepository
-                .findRandomContentsByCategories(diseasesList, 3);
-
-        return new CounselResultResponse(counsel.getResult(), counsel.getSummary(),
-                dialogRepository.findAllByCounselOrderByCreatedDateTimeAsc(counsel), limitThreeContents);
     }
 }
