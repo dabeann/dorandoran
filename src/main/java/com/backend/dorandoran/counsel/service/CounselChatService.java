@@ -48,6 +48,7 @@ public class CounselChatService {
     private final OpenAiService openAiService;
 
 
+    @Transactional
     public String getChatResult(ChatRequest request) {
         Long counselId = request.counselId();
         String userMessage = request.message();
@@ -72,6 +73,9 @@ public class CounselChatService {
                 Dialog.builder().counsel(counsel).role(DialogRole.FROM_USER).contents(userMessage).build());
         dialogRepository.save(
                 Dialog.builder().counsel(counsel).role(DialogRole.FROM_CONSULTANT).contents(gptResponse).build());
+
+        counsel.updateUpdatedDateNow();
+
         return gptResponse;
     }
 
