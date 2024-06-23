@@ -71,10 +71,6 @@ public class Counsel extends BaseDateTimeEntity {
         this.summary = summary;
     }
 
-    public void updateUpdatedDateNow() {
-        setUpdatedDateTime(LocalDateTime.now());
-    }
-
     public static Counsel toCounselEntity(User user) {
         return Counsel.builder()
                 .user(user)
