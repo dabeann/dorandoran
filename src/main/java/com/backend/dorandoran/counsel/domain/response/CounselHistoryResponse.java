@@ -19,7 +19,7 @@ public record CounselHistoryResponse (
                     .map(counsel -> new CounselHistory(
                             counsel.getId(),
                             counsel.getTitle(),
-                            counsel.getCreatedDateTime().toLocalDate()
+                            counsel.getUpdatedDateTime().toLocalDate()
                     ))
                     .toList();
         }
