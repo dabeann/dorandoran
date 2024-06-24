@@ -20,7 +20,7 @@ public class GptConfig {
 
     public static final double TEMPERATURE = 1.0;
 
-    public static final Duration TIME_OUT = Duration.ofSeconds(300);
+    public static final Duration TIME_OUT = Duration.ofSeconds(3600);
 
     @Bean
     public OpenAiService openAiService() {

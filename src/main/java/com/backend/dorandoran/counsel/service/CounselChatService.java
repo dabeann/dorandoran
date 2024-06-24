@@ -165,7 +165,7 @@ public class CounselChatService {
         String systemMessage = "다음 사용자 메시지와 상담자의 응답을 기반으로 상담 제목을 아주 짧게 생성해주세요. \n"
                                 + "명사로 끝맺어주세요.\n"
                                 + "사용자 메시지: " + userMessage
-                                + "\n상담자 응답: " + gptMessage + "\n상담명:";
+                                + "\n상담자 응답: " + gptMessage;
         ChatMessage systemMsg = new ChatMessage(ChatMessageRole.SYSTEM.toString().toLowerCase(), systemMessage);
         messages.add(systemMsg);
 
