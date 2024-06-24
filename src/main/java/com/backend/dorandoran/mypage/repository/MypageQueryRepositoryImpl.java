@@ -2,6 +2,7 @@ package com.backend.dorandoran.mypage.repository;
 
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.ErrorCode;
+import com.backend.dorandoran.common.domain.counsel.CounselState;
 import com.backend.dorandoran.common.exception.CommonException;
 import com.backend.dorandoran.counsel.domain.entity.QCounsel;
 import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
@@ -88,6 +89,7 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
         };
     }
 
+    // state = FINISH_STATE, 날짜, 토큰 사용으로 수정하기
     @Override
     public List<CompletedCounselResponse> getCompletedCounselList(Long userId, String counselDate) {
         LocalDate targetDate = LocalDate.parse(counselDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -95,11 +97,13 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
         LocalDateTime endOfDay = startOfDay.toLocalDate().atTime(23, 59, 59);
 
         return jpaQueryFactory.select(Projections.constructor(CompletedCounselResponse.class,
-                    counsel.id, counsel.title, counsel.createdDateTime
+                    counsel.id, counsel.title, counsel.updatedDateTime
                 ))
                 .from(counsel)
                 .where(counsel.user.id.eq(userId)
-                        .and(counsel.createdDateTime.between(startOfDay, endOfDay)))
+                        .and(counsel.updatedDateTime.between(startOfDay, endOfDay))
+                        .and(counsel.state.eq(CounselState.FINISH_STATE))
+                )
                 .fetch();
     }
 }

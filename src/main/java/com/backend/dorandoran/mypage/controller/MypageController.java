@@ -119,7 +119,7 @@ class MypageController {
                     - List<Object> 상담 목록
                         - Long counselId 상담번호
                         - String title 상담 제목
-                        - String createdDate 상담일
+                        - String counselDate 상담일
                     """)
     @PostMapping("/counsel-list")
     ResponseEntity<CommonResponse<List<CompletedCounselResponse>>> getCompletedCounselList(
