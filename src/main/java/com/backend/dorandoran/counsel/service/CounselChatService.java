@@ -175,8 +175,8 @@ public class CounselChatService {
     private List<ChatMessage> checkEmergencyStatus(String userMessage) {
         List<ChatMessage> messages = new ArrayList<>();
 
-        String systemMessage = "자살, 자해 등과 같이 사용자 메시지에 위급상황으로 판단되는 문맥 또는 단어가 발견되면 1, "
-                + "그렇지 않다면 0을 반환해: " + userMessage;
+        String systemMessage = "자살, 자해 등과 같이 굉장한 위급상황인 경우에만 1, 아닌 경우에는 0을 반환해줘. "
+                + "1의 예시 : 죽고 싶다, 더 이상 살고싶지 않아 등 0의 예시 : 우울해, 아무 이유없이 무기력해 등" + userMessage;
         ChatMessage systemMsg = new ChatMessage(ChatMessageRole.SYSTEM.toString().toLowerCase(), systemMessage);
         messages.add(systemMsg);
 
