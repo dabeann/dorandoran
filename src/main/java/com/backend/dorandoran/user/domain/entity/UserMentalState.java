@@ -46,11 +46,19 @@ public class UserMentalState extends BaseDateTimeEntity {
     }
 
     public static UserMentalState toUserMentalStateEntity(User user, UserMentalState previousMentalState, int[] scores) {
+        int depressionScore = previousMentalState.getDepression() + scores[0];
+        int stressScore = previousMentalState.getStress() + scores[1];
+        int anxietyScore = previousMentalState.getAnxiety() + scores[2];
+
+        depressionScore = Math.max(0, Math.min(100, depressionScore));
+        stressScore = Math.max(0, Math.min(100, stressScore));
+        anxietyScore = Math.max(0, Math.min(100, anxietyScore));
+
         return UserMentalState.builder()
                 .user(user)
-                .depression(previousMentalState.getDepression() + scores[0])
-                .stress(previousMentalState.getStress() + scores[1])
-                .anxiety(previousMentalState.getAnxiety() + scores[2])
+                .depression(depressionScore)
+                .stress(stressScore)
+                .anxiety(anxietyScore)
                 .build();
     }
 }
