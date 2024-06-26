@@ -77,6 +77,7 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
                 .from(userMentalState)
                 .where(userMentalState.user.id.eq(userId)
                         .and(monthTemplate.eq(request.month())))
+                .offset(1)
                 .fetch();
     }
 
