@@ -77,6 +77,7 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
                 .from(userMentalState)
                 .where(userMentalState.user.id.eq(userId)
                         .and(monthTemplate.eq(request.month())))
+                .offset(1)
                 .fetch();
     }
 
@@ -89,7 +90,6 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
         };
     }
 
-    // state = FINISH_STATE, 날짜, 토큰 사용으로 수정하기
     @Override
     public List<CompletedCounselResponse> getCompletedCounselList(Long userId, String counselDate) {
         LocalDate targetDate = LocalDate.parse(counselDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
