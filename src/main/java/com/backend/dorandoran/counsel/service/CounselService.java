@@ -9,14 +9,13 @@ import com.backend.dorandoran.common.validator.CommonValidator;
 import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import com.backend.dorandoran.counsel.domain.entity.Dialog;
 import com.backend.dorandoran.counsel.domain.response.*;
+import com.backend.dorandoran.counsel.repository.CounselQueryRepository;
 import com.backend.dorandoran.counsel.repository.CounselRepository;
 import com.backend.dorandoran.counsel.repository.DialogRepository;
 import com.backend.dorandoran.security.service.UserInfoUtil;
 import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +31,7 @@ public class CounselService {
     private final CounselRepository counselRepository;
     private final DialogRepository dialogRepository;
     private final UserMentalStateRepository userMentalStateRepository;
+    private final CounselQueryRepository counselQueryRepository;
 
     public SuggestHospitalResponse suggestHospitalVisit() {
         final Long userId = UserInfoUtil.getUserIdOrThrow();
@@ -96,19 +96,10 @@ public class CounselService {
 
         CounselState counselState = CounselState.valueOfLowerState(state);
         CommonValidator.notNullOrThrow(counselState, ErrorCode.NOT_FOUND_COUNSEL_STATE);
-        List<Counsel> counselListByState = counselRepository.findAllByStateAndUserOrderByCreatedDateTimeDesc(
-                counselState, user);
-
-        List<LocalDate> localDateList = new ArrayList<>();
-        for (Counsel counsel : counselListByState) {
-            localDateList.add(
-                    dialogRepository.findFirstByCounselOrderByCreatedDateTimeDesc(counsel).get().getCreatedDateTime()
-                            .toLocalDate());
-        }
 
         boolean hasCounselHistory = !counselRepository.findAllByUser(user).isEmpty();
         return new CounselHistoryResponse(isPsychTestDone, hasCounselHistory,
-                CounselHistoryResponse.CounselHistory.fromCounselList(counselListByState, localDateList));
+                counselQueryRepository.getCounselHistoryByState(counselState, userId));
     }
 
     public ProceedCounselResponse getProceedCounsel(Long counselId) {
