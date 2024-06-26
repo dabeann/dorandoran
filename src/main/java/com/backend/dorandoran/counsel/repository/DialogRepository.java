@@ -16,6 +16,4 @@ public interface DialogRepository extends JpaRepository<Dialog, Long> {
     boolean existsByCounselAndRole(Counsel counsel, DialogRole dialogRole);
 
     List<Dialog> findAllByCounselOrderByCreatedDateTimeAsc(Counsel counsel, Pageable pageable);
-
-    Optional<Dialog> findFirstByCounselOrderByCreatedDateTimeDesc(Counsel counsel);
 }
