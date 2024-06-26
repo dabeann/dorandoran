@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CounselRepository extends JpaRepository<Counsel, Long> {
 
-    List<Counsel> findAllByStateAndUserOrderByCreatedDateTimeDesc(CounselState state, User user);
-
     List<Counsel> findAllByUser(User user);
 
     Long countByTitleAndUser(String title, User user);
