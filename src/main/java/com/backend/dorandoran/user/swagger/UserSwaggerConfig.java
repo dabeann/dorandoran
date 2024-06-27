@@ -10,7 +10,7 @@ class UserSwaggerConfig {
     @Bean
     GroupedOpenApi userDocs() {
         return GroupedOpenApi.builder()
-                .group("User API")
+                .group("사용자 API")
                 .packagesToScan("com.backend.dorandoran.user.controller")
                 .build();
     }

@@ -10,7 +10,7 @@ class MypageSwaggerConfig {
     @Bean
     GroupedOpenApi mypagerDocs() {
         return GroupedOpenApi.builder()
-                .group("Mypage API")
+                .group("마이페이지 API")
                 .packagesToScan("com.backend.dorandoran.mypage.controller")
                 .build();
     }
