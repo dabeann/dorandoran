@@ -97,7 +97,8 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
         LocalDateTime endOfDay = startOfDay.toLocalDate().atTime(23, 59, 59);
 
         return jpaQueryFactory.select(Projections.constructor(CompletedCounselResponse.class,
-                    counsel.id, counsel.title, counsel.updatedDateTime
+                    counsel.id, counsel.title,
+                        Expressions.stringTemplate("to_char({0}, 'YYYY-MM-DD')", counsel.updatedDateTime)
                 ))
                 .from(counsel)
                 .where(counsel.user.id.eq(userId)
