@@ -1,19 +1,14 @@
 package com.backend.dorandoran.mypage.domain.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public record CompletedCounselResponse(
         Long counselId,
         String title,
-        String counselDate
+        LocalDate date
 ) {
-    public CompletedCounselResponse(Long id, String title, LocalDateTime counselDate) {
-        this(id, title, formatDateTime(counselDate));
-    }
-
-    private static String formatDateTime(LocalDateTime counselDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-        return counselDate.format(formatter);
+    public CompletedCounselResponse(Long id, String title, String createdDateStr) {
+        this(id, title, LocalDate.parse(createdDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     }
 }
