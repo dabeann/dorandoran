@@ -8,7 +8,6 @@ import com.backend.dorandoran.mypage.domain.response.CompletedCounselResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
 import com.backend.dorandoran.mypage.domain.response.PsychologicalChangeTrendResponse;
 import com.backend.dorandoran.mypage.service.MypageService;
-import com.backend.dorandoran.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +26,6 @@ import java.util.List;
 @RestController
 class MypageController {
 
-    private final UserService userService;
     private final MypageService mypageService;
 
     @Operation(summary = "summary : 마이페이지 메인",
@@ -115,7 +113,7 @@ class MypageController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/logout")
     ResponseEntity<CommonResponse<String>> logout() {
-        userService.logout();
+        mypageService.logout();
         return new ResponseEntity<>(new CommonResponse<>("로그아웃", "Success"), HttpStatus.OK);
     }
 
@@ -130,7 +128,7 @@ class MypageController {
     @ApiResponse(responseCode = "200")
     @PostMapping("/sign-out")
     ResponseEntity<CommonResponse<String>> signOut() {
-        userService.signOut();
+        mypageService.signOut();
         return new ResponseEntity<>(new CommonResponse<>("회원 탈퇴", "Success"), HttpStatus.OK);
     }
 }
