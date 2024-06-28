@@ -23,16 +23,17 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -131,7 +132,7 @@ public class CounselResultService {
                     continue;
                 }
 
-                saveNewUserMentalState(user, scores);
+                saveNewUserMentalState(user, scores, counsel);
                 String result = getResult(user, totalScore);
                 counsel.updateResult(result);
 
@@ -150,10 +151,10 @@ public class CounselResultService {
         return result;
     }
 
-    private void saveNewUserMentalState(User user, int[] scores) {
+    private void saveNewUserMentalState(User user, int[] scores, Counsel counsel) {
         UserMentalState previousMentalState = userMentalStateRepository.findFirstByUserOrderByCreatedDateTimeDesc(user)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENTAL_STATE));
-        UserMentalState userMentalState = UserMentalState.toUserMentalStateEntity(user, previousMentalState, scores);
+        UserMentalState userMentalState = UserMentalState.toUserMentalStateEntity(user, previousMentalState, scores, counsel);
         userMentalStateRepository.save(userMentalState);
     }
 
