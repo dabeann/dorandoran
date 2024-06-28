@@ -2,6 +2,7 @@ package com.backend.dorandoran.user.domain.entity;
 
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.BaseDateTimeEntity;
+import com.backend.dorandoran.counsel.domain.entity.Counsel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,10 @@ public class UserMentalState extends BaseDateTimeEntity {
     @Column(name = "anxiety", nullable = false)
     private Integer anxiety;
 
+    @OneToOne
+    @JoinColumn(name = "counsel_id", unique = true)
+    private Counsel counsel;
+
     public static UserMentalState toUserMentalStateEntity(User user, List<PsychologicalAssessmentResponse.PsychologicalAssessmentResult> results) {
         return UserMentalState.builder()
                 .user(user)
@@ -45,7 +50,7 @@ public class UserMentalState extends BaseDateTimeEntity {
                 .build();
     }
 
-    public static UserMentalState toUserMentalStateEntity(User user, UserMentalState previousMentalState, int[] scores) {
+    public static UserMentalState toUserMentalStateEntity(User user, UserMentalState previousMentalState, int[] scores, Counsel counsel) {
         int depressionScore = previousMentalState.getDepression() + scores[0];
         int stressScore = previousMentalState.getStress() + scores[1];
         int anxietyScore = previousMentalState.getAnxiety() + scores[2];
@@ -59,6 +64,7 @@ public class UserMentalState extends BaseDateTimeEntity {
                 .depression(depressionScore)
                 .stress(stressScore)
                 .anxiety(anxietyScore)
+                .counsel(counsel)
                 .build();
     }
 }
