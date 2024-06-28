@@ -17,9 +17,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -61,7 +58,7 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
                 .where(user.id.eq(userId))
                 .fetchFirst();
     }
-    
+
     @Override
     public List<PsychologicalChangeTrendResponse> getUserPsychologicalChangeTrend(Long userId, PsychologicalChangeTrendRequest request) {
         NumberTemplate<Integer> dayTemplate =
@@ -93,20 +90,13 @@ public class MypageQueryRepositoryImpl implements MypageQueryRepository {
     }
 
     @Override
-    public List<CompletedCounselResponse> getCompletedCounselList(Long userId, String counselDate) {
-        LocalDate targetDate = LocalDate.parse(counselDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
-        LocalDateTime startOfDay = targetDate.atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.toLocalDate().atTime(23, 59, 59);
-
+    public CompletedCounselResponse getCompletedCounsel(Long counselId) {
         return jpaQueryFactory.select(Projections.constructor(CompletedCounselResponse.class,
                     counsel.id, counsel.title,
                         Expressions.stringTemplate("to_char({0}, 'YYYY-MM-DD')", counsel.updatedDateTime)
                 ))
                 .from(counsel)
-                .where(counsel.user.id.eq(userId)
-                        .and(counsel.updatedDateTime.between(startOfDay, endOfDay))
-                        .and(counsel.state.eq(CounselState.FINISH_STATE))
-                )
-                .fetch();
+                .where(counsel.id.eq(counselId))
+                .fetchOne();
     }
 }

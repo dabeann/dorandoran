@@ -1,7 +1,6 @@
 package com.backend.dorandoran.mypage.service;
 
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
-import com.backend.dorandoran.mypage.domain.request.CompletedCounselRequest;
 import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
 import com.backend.dorandoran.mypage.domain.response.CompletedCounselResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
@@ -36,8 +35,7 @@ public class MypageService {
         return mypageQueryRepository.getUserPsychologicalChangeTrend(userId, request);
     }
 
-    public List<CompletedCounselResponse> getCompletedCounselList(CompletedCounselRequest request) {
-        Long userId = UserInfoUtil.getUserIdOrThrow();
-        return mypageQueryRepository.getCompletedCounselList(userId, request.counselDate());
+    public CompletedCounselResponse getCompletedCounsel(Long counselId) {
+        return mypageQueryRepository.getCompletedCounsel(counselId);
     }
 }
