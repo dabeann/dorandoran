@@ -47,24 +47,6 @@ class PsychologicalAssessmentController {
                     - List<Object> questionAnswers 문항 답변 리스트
                         - Integer questionId 문항 번호
                         - Integer answerId 답변 번호
-                    - 예시
-                        {
-                            "category": "BASIC",
-                            "questionAnswers": [
-                                    {
-                                        "questionId": 1,
-                                        "answerId": 4
-                                    },
-                                    {
-                                        "questionId": 2,
-                                        "answerId": 3
-                                    },
-                                    {
-                                        "questionId": 3,
-                                        "answerId": 45
-                                    }
-                            ]
-                        }
                     ## 응답 :
                     - String name 검사자 이름
                     - String testDate 검사일
@@ -73,34 +55,6 @@ class PsychologicalAssessmentController {
                         - Integer score 점수
                         - Integer percent 퍼센트(%)
                         - String standard 기준 (적음, 중간, 심각)
-                    - 예시
-                        {
-                            "message": "심리검사 결과 분석",
-                            "data": {
-                                "name": "박다정",
-                                "testDate": "2024년 06월 03일",
-                                "result": [
-                                    {
-                                        "category": "DEPRESSION",
-                                        "score": 67,
-                                        "percent": 33,
-                                        "standard": "중간"
-                                    },
-                                    {
-                                        "category": "STRESS",
-                                        "score": 60,
-                                        "percent": 40,
-                                        "standard": "중간"
-                                    },
-                                    {
-                                        "category": "ANXIETY",
-                                        "score": 73,
-                                        "percent": 27,
-                                        "standard": "중간"
-                                    }
-                                ]
-                            }
-                        }
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
