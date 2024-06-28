@@ -3,7 +3,6 @@ package com.backend.dorandoran.mypage.controller;
 import com.backend.dorandoran.assessment.domain.response.PsychologicalAssessmentResponse;
 import com.backend.dorandoran.common.domain.response.BasicApiSwaggerResponse;
 import com.backend.dorandoran.common.response.CommonResponse;
-import com.backend.dorandoran.mypage.domain.request.CompletedCounselRequest;
 import com.backend.dorandoran.mypage.domain.request.PsychologicalChangeTrendRequest;
 import com.backend.dorandoran.mypage.domain.response.CompletedCounselResponse;
 import com.backend.dorandoran.mypage.domain.response.MypageMainResponse;
@@ -15,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,31 +56,7 @@ class MypageController {
                         - String category 카테고리
                         - Integer score 점수
                         - Integer percent 퍼센트(%)
-                    - 예시
-                        {
-                            "message": "심리검사 결과 분석",
-                            "data": {
-                                "name": "박다정",
-                                "testDate": "2024년 06월 03일",
-                                "result": [
-                                    {
-                                        "category": "DEPRESSION",
-                                        "score": 67,
-                                        "percent": 33
-                                    },
-                                    {
-                                        "category": "STRESS",
-                                        "score": 60,
-                                        "percent": 40
-                                    },
-                                    {
-                                        "category": "ANXIETY",
-                                        "score": 73,
-                                        "percent": 27
-                                    }
-                                ]
-                            }
-                        }
+                        - String standard 기준
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
@@ -100,6 +76,7 @@ class MypageController {
                     - List<Object> 심리상태 생성일 및 점수 목록
                         - Integer dayOfMonth 상담일
                         - Integer score 점수
+                        - Long counselId 상담번호
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
@@ -110,22 +87,21 @@ class MypageController {
                 mypageService.getUserPsychologicalChangeTrend(request)), HttpStatus.OK);
     }
 
-    @Operation(summary = "summary : 완료한 상담 목록 조회",
+    @Operation(summary = "summary : 완료한 상담 조회",
             description = """
                     ## 요청 :
                     - Header(Authorization Bearer *토큰* (필수))
-                    - String counselDate 상담일(yyyyMMdd 형태)
+                    - Long counselId 상담번호
                     ## 응답 :
-                    - List<Object> 상담 목록
-                        - Long counselId 상담번호
-                        - String title 상담 제목
-                        - String counselDate 상담일
+                    - Long counselId 상담번호
+                    - String title 상담 제목
+                    - String counselDate 상담일
                     """)
-    @PostMapping("/counsel-list")
-    ResponseEntity<CommonResponse<List<CompletedCounselResponse>>> getCompletedCounselList(
-            @Valid @RequestBody CompletedCounselRequest request) {
-        return new ResponseEntity<>(new CommonResponse<>("완료한 상담 목록 조회",
-                mypageService.getCompletedCounselList(request)), HttpStatus.OK);
+    @GetMapping("/counsel/{counselId}")
+    ResponseEntity<CommonResponse<CompletedCounselResponse>> getCompletedCounsel(
+            @PathVariable("counselId") @NotNull Long counselId) {
+        return new ResponseEntity<>(new CommonResponse<>("완료한 상담 조회",
+                mypageService.getCompletedCounsel(counselId)), HttpStatus.OK);
     }
 
     @Operation(summary = "summary : 로그아웃",
@@ -133,7 +109,7 @@ class MypageController {
                     ## 요청 :
                     - Header(Authorization Bearer *토큰* (필수))
                     ## 응답 :
-                    - 200, "Success"
+                    - String data "Success"
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
@@ -148,7 +124,7 @@ class MypageController {
                     ## 요청 :
                     - Header(Authorization Bearer *토큰* (필수))
                     ## 응답 :
-                    - 200, "Success"
+                    - String data "Success"
                     """)
     @BasicApiSwaggerResponse
     @ApiResponse(responseCode = "200")
