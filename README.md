@@ -19,7 +19,25 @@
 <br/>
 
 ## 🛠 Tech Stack 🛠 
-[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1719727210027?alt=media&token=e645a95b-db57-4520-b81c-39c028d10300)](https://github.com/msdio/stackticon)
+### Backend
+- ![QueryDSL](https://img.shields.io/badge/QueryDSL-6DB33F?style=plastic&logo=Spring&logoColor=white)
+- ![Java](https://img.shields.io/badge/Java-ED8B00?style=plastic&logo=&logoColor=white)
+- ![ChatGPT API](https://img.shields.io/badge/ChatGPT%20API-7FE719?style=plastic&logo=&logoColor=white)
+- ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=plastic&logo=Spring&logoColor=white)
+- ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=plastic&logo=Spring%20Security&logoColor=white)
+- ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=plastic&logo=Spring&logoColor=white)
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=plastic&logo=PostgreSQL&logoColor=white)
+- ![Redis](https://img.shields.io/badge/Redis-FF4438?style=plastic&logo=Redis&logoColor=white)
+
+### Infrastructure
+- ![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-FF9900?style=plastic&logo=Amazon%20EC2&logoColor=white)
+- ![Amazon RDS](https://img.shields.io/badge/Amazon_RDS-527FFF?style=plastic&logo=Amazon%20RDS&logoColor=white)
+
+### DevOps
+- ![Github Actions](https://img.shields.io/badge/Github_Actions-2088FF?style=plastic&logo=Github%20Actions&logoColor=white)
+
+### Security
+- ![JSON Web Tokens](https://img.shields.io/badge/JSON_Web_Tokens-000000?style=plastic&logo=JSON%20Web%20Tokens&logoColor=white)
 <br/>
 <br/>
 
