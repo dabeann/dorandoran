@@ -19,7 +19,7 @@
 <br/>
 
 ## 🛠 Tech Stack 🛠 
-
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1719727210027?alt=media&token=e645a95b-db57-4520-b81c-39c028d10300)](https://github.com/msdio/stackticon)
 <br/>
 <br/>
 
