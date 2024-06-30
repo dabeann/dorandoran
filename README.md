@@ -27,11 +27,11 @@
 - ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=plastic&logo=Spring%20Security&logoColor=white)
 - ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=plastic&logo=Spring&logoColor=white)
 - ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=plastic&logo=PostgreSQL&logoColor=white)
-- ![Redis](https://img.shields.io/badge/Redis-FF4438?style=plastic&logo=Redis&logoColor=white)
 
 ### Infrastructure
 - ![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-FF9900?style=plastic&logo=Amazon%20EC2&logoColor=white)
 - ![Amazon RDS](https://img.shields.io/badge/Amazon_RDS-527FFF?style=plastic&logo=Amazon%20RDS&logoColor=white)
+- ![Redis](https://img.shields.io/badge/Redis-FF4438?style=plastic&logo=Redis&logoColor=white)
 
 ### DevOps
 - ![Github Actions](https://img.shields.io/badge/Github_Actions-2088FF?style=plastic&logo=Github%20Actions&logoColor=white)
