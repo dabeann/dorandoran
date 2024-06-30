@@ -16,5 +16,5 @@ public interface MypageQueryRepository {
 
     List<PsychologicalChangeTrendResponse> getUserPsychologicalChangeTrend(Long userId, PsychologicalChangeTrendRequest request);
 
-    List<CompletedCounselResponse> getCompletedCounselList(Long userId, String counselDate);
+    CompletedCounselResponse getCompletedCounsel(Long counselId);
 }

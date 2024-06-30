@@ -16,14 +16,12 @@ import com.backend.dorandoran.user.domain.entity.User;
 import com.backend.dorandoran.user.domain.entity.UserMentalState;
 import com.backend.dorandoran.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PsychologicalAssessmentService {

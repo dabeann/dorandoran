@@ -30,9 +30,9 @@ public class CounselQueryRepositoryImpl implements CounselQueryRepository{
                 .from(user)
                 .innerJoin(counsel).on(user.id.eq(userId))
                 .innerJoin(dialog).on(dialog.counsel.eq(counsel))
-                .where(user.id.eq(userId))
-                .where(counsel.user.eq(user))
-                .where(counsel.state.eq(counselState))
+                .where(user.id.eq(userId)
+                        .and(counsel.user.eq(user))
+                        .and(counsel.state.eq(counselState)))
                 .groupBy(counsel.id)
                 .orderBy(dialog.createdDateTime.max().desc())
                 .fetch();
